@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import AuthLayout from "@/components/AuthLayout";
-import { Google } from "lucide-react";
+import { LogIn } from "lucide-react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -26,7 +26,7 @@ const Login = () => {
     >
       <div className="mt-8 space-y-6">
         <Button className="w-full bg-[#4285F4] hover:bg-[#4285F4]/90 text-white" onClick={() => navigate("/dashboard")}>
-          <Google className="mr-2 h-4 w-4" />
+          <LogIn className="mr-2 h-4 w-4" />
           Sign in with Google
         </Button>
         
