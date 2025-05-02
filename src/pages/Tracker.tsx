@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
-import { Dumbbell, Heart, Play, Pause, RotateCcw, Clock, Stopwatch } from "lucide-react";
+import { Dumbbell, Heart, Play, Pause, RotateCcw, Clock, Timer } from "lucide-react";
 
 const Tracker = () => {
   const [isActive, setIsActive] = useState(false);
@@ -12,7 +12,7 @@ const Tracker = () => {
   const [calories, setCalories] = useState(0);
   
   useEffect(() => {
-    let interval: number | undefined;
+    let interval: ReturnType<typeof setInterval> | undefined;
     
     if (isActive) {
       interval = setInterval(() => {
@@ -27,7 +27,9 @@ const Tracker = () => {
       clearInterval(interval);
     }
     
-    return () => clearInterval(interval);
+    return () => {
+      if (interval) clearInterval(interval);
+    };
   }, [isActive, time]);
   
   const formatTime = (seconds: number) => {
@@ -53,7 +55,7 @@ const Tracker = () => {
       <Tabs defaultValue="timer" className="w-full">
         <TabsList className="mb-6 grid w-full grid-cols-2">
           <TabsTrigger value="timer">
-            <Stopwatch className="mr-2 h-4 w-4" />
+            <Timer className="mr-2 h-4 w-4" />
             Timer
           </TabsTrigger>
           <TabsTrigger value="workout">

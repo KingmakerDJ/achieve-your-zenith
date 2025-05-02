@@ -1,11 +1,11 @@
 
-import { Activity, Heart, Stopwatch } from "lucide-react";
+import { Activity, Heart, Timer } from "lucide-react";
 
 interface TimelineItem {
   time: string;
   title: string;
   description: string;
-  icon: "activity" | "heart" | "stopwatch";
+  icon: "activity" | "heart" | "timer";
 }
 
 interface ExerciseTimelineProps {
@@ -13,33 +13,30 @@ interface ExerciseTimelineProps {
 }
 
 const ExerciseTimeline = ({ items }: ExerciseTimelineProps) => {
-  const renderIcon = (iconName: string) => {
-    switch(iconName) {
+  const getIcon = (iconName: string) => {
+    switch (iconName) {
       case "activity":
-        return <Activity className="h-4 w-4 text-fitness-primary" />;
+        return <Activity className="h-5 w-5 text-fitness-primary" />;
       case "heart":
-        return <Heart className="h-4 w-4 text-fitness-accent" />;
-      case "stopwatch":
-        return <Stopwatch className="h-4 w-4 text-fitness-secondary" />;
+        return <Heart className="h-5 w-5 text-fitness-accent" />;
+      case "timer":
+        return <Timer className="h-5 w-5 text-fitness-secondary" />;
       default:
-        return <Activity className="h-4 w-4 text-fitness-primary" />;
+        return <Activity className="h-5 w-5 text-fitness-primary" />;
     }
   };
-  
+
   return (
-    <div className="space-y-6 pt-2">
+    <div className="space-y-4">
       {items.map((item, index) => (
-        <div key={index} className="relative pl-6">
-          <div className="absolute left-0 top-1 bg-white rounded-full border border-muted p-1">
-            {renderIcon(item.icon)}
+        <div key={index} className="flex items-start">
+          <div className="mr-3 flex h-10 w-10 items-center justify-center rounded-full bg-fitness-primary/10">
+            {getIcon(item.icon)}
           </div>
-          {index !== items.length - 1 && (
-            <div className="absolute left-[0.9rem] top-7 w-[1px] h-[calc(100%+0.5rem)] bg-muted" />
-          )}
           <div>
             <p className="text-xs text-muted-foreground">{item.time}</p>
-            <h5 className="font-medium text-sm">{item.title}</h5>
-            <p className="text-xs text-muted-foreground mt-1">{item.description}</p>
+            <p className="text-sm font-medium">{item.title}</p>
+            <p className="text-sm text-muted-foreground">{item.description}</p>
           </div>
         </div>
       ))}

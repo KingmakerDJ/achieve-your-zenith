@@ -1,5 +1,5 @@
 
-import { Activity, Dumbbell, Heart, Stopwatch, Thermometer } from "lucide-react";
+import { Activity, Dumbbell, Heart, Timer, Thermometer } from "lucide-react";
 import StatCard from "@/components/StatCard";
 import WorkoutCard from "@/components/WorkoutCard";
 import ActivityProgress from "@/components/ActivityProgress";
@@ -11,7 +11,7 @@ const Dashboard = () => {
       time: "Today, 6:30 AM",
       title: "Morning Cardio",
       description: "30 min · 350 calories",
-      icon: "stopwatch" as const
+      icon: "timer" as const
     },
     {
       time: "Yesterday, 5:45 PM",
@@ -50,7 +50,7 @@ const Dashboard = () => {
         <StatCard 
           title="Active Time" 
           value="87 min" 
-          icon={<Stopwatch className="h-5 w-5 text-fitness-secondary" />}
+          icon={<Timer className="h-5 w-5 text-fitness-secondary" />}
           change="-8% from yesterday"
           isPositive={false}
         />
