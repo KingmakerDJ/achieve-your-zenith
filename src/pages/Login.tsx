@@ -70,8 +70,8 @@ const Login = () => {
 
           <div className="flex items-center justify-between">
             <div className="text-sm">
-              <Link to="/signup" className="text-[#3D9DA1] hover:underline">
-                Don't have an account?
+              <Link to="/signup" className="text-[#3D9DA1] hover:underline font-medium">
+                Don't have an account? Sign up
               </Link>
             </div>
             <div className="text-sm">
@@ -84,16 +84,6 @@ const Login = () => {
           <Button type="submit" className="w-full bg-[#3D9DA1] hover:bg-[#3D9DA1]/90">
             Sign in
           </Button>
-
-          <div className="text-center">
-            <button 
-              type="button" 
-              className="text-sm text-blue-500 hover:underline" 
-              onClick={() => navigate("/dashboard")}
-            >
-              Skip
-            </button>
-          </div>
         </form>
       </div>
     </AuthLayout>
