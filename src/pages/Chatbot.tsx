@@ -11,6 +11,7 @@ interface Message {
   text: string;
   isUser: boolean;
   timestamp: Date;
+  structured?: boolean;
 }
 
 const presetButtons = [
@@ -70,7 +71,7 @@ const Chatbot = () => {
       setMessages(prev => 
         prev.map(msg => 
           msg.id === loadingId 
-            ? { ...msg, text: response } 
+            ? { ...msg, text: response, structured: true } 
             : msg
         )
       );
@@ -109,6 +110,13 @@ const Chatbot = () => {
                 {
                   text: `You are an AI fitness coach. Provide helpful, accurate, and engaging fitness advice. 
                   Focus only on fitness, exercise, nutrition, and wellness topics. Do not provide medical diagnoses.
+                  Format your responses with appropriate markdown:
+                  - Use ## for main headings
+                  - Use ### for subheadings
+                  - Use bullets (- ) and numbered lists (1. ) for steps
+                  - Bold important text with **text**
+                  - Use line breaks to separate sections
+                  
                   Keep responses under 300 words and be motivational. Current user query: ${userMessage}`
                 }
               ]
@@ -144,6 +152,71 @@ const Chatbot = () => {
     }
   };
 
+  // Function to render structured message content with markdown-like formatting
+  const renderStructuredContent = (content: string) => {
+    // Split into paragraphs
+    const paragraphs = content.split('\n\n');
+    
+    return (
+      <div className="space-y-3">
+        {paragraphs.map((paragraph, index) => {
+          // Handle headings
+          if (paragraph.startsWith('## ')) {
+            return <h2 key={index} className="text-xl font-bold mt-4">{paragraph.substring(3)}</h2>;
+          } else if (paragraph.startsWith('### ')) {
+            return <h3 key={index} className="text-lg font-semibold mt-3">{paragraph.substring(4)}</h3>;
+          } 
+          // Handle bullet points
+          else if (paragraph.includes('\n- ')) {
+            const [title, ...items] = paragraph.split('\n- ');
+            return (
+              <div key={index}>
+                {title && <p className="mb-1">{title}</p>}
+                <ul className="list-disc pl-5 space-y-1">
+                  {items.map((item, i) => <li key={i}>{formatTextWithBold(item)}</li>)}
+                </ul>
+              </div>
+            );
+          }
+          // Handle numbered lists
+          else if (paragraph.includes('\n1. ')) {
+            const [title, ...items] = paragraph.split('\n');
+            return (
+              <div key={index}>
+                {title && title !== '1.' && <p className="mb-1">{title}</p>}
+                <ol className="list-decimal pl-5 space-y-1">
+                  {items.map((item, i) => {
+                    const content = item.substring(item.indexOf('.') + 2);
+                    return content ? <li key={i}>{formatTextWithBold(content)}</li> : null;
+                  })}
+                </ol>
+              </div>
+            );
+          }
+          // Regular paragraph
+          else {
+            return <p key={index} className="text-gray-800">{formatTextWithBold(paragraph)}</p>;
+          }
+        })}
+      </div>
+    );
+  };
+  
+  // Helper function to format bold text within a string
+  const formatTextWithBold = (text: string) => {
+    // Split by bold markers
+    const parts = text.split(/(\*\*.*?\*\*)/g);
+    
+    return parts.map((part, index) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        // Bold text
+        return <strong key={index}>{part.slice(2, -2)}</strong>;
+      }
+      // Regular text
+      return <span key={index}>{part}</span>;
+    });
+  };
+
   return (
     <div className="container py-6 max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-2">Virtual Fitness Coach</h1>
@@ -175,7 +248,10 @@ const Chatbot = () => {
                         : 'bg-gray-100 text-gray-800'
                     }`}
                   >
-                    <p>{message.text}</p>
+                    {message.structured && !message.isUser ? 
+                      renderStructuredContent(message.text) : 
+                      <p>{message.text}</p>
+                    }
                     <p className="text-xs mt-1 opacity-70">
                       {message.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                     </p>
