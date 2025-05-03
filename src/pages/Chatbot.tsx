@@ -3,16 +3,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { MessageSquare, Send, Key } from "lucide-react";
-import { 
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import { MessageSquare, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Message {
@@ -40,36 +31,10 @@ const Chatbot = () => {
   ]);
   
   const [inputValue, setInputValue] = useState("");
-  const [apiKey, setApiKey] = useState<string>(() => {
-    return localStorage.getItem("googleApiKey") || "";
-  });
-  const [tempApiKey, setTempApiKey] = useState("");
-  const [apiKeyDialogOpen, setApiKeyDialogOpen] = useState(false);
+  // Using the provided API key directly
+  const apiKey = "AIzaSyAZKojWKhOW8iX7-W74eWmuAr2YKpb4DCc";
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  
-  useEffect(() => {
-    // Check if API key exists on component mount
-    const savedApiKey = localStorage.getItem("googleApiKey");
-    if (savedApiKey) {
-      setApiKey(savedApiKey);
-    } else {
-      // Open dialog if no API key is found
-      setApiKeyDialogOpen(true);
-    }
-  }, []);
-
-  const handleSaveApiKey = () => {
-    if (tempApiKey.trim()) {
-      localStorage.setItem("googleApiKey", tempApiKey.trim());
-      setApiKey(tempApiKey.trim());
-      setApiKeyDialogOpen(false);
-      toast({
-        title: "API Key Saved",
-        description: "Your Google Gemini API key has been securely saved in your browser.",
-      });
-    }
-  };
   
   const handleSendMessage = async (text: string = inputValue) => {
     if (!text.trim()) return;
@@ -84,21 +49,6 @@ const Chatbot = () => {
     
     setMessages(prev => [...prev, userMessage]);
     setInputValue("");
-    
-    // Check if API key is available
-    if (!apiKey) {
-      setTimeout(() => {
-        const noApiKeyMessage: Message = {
-          id: messages.length + 2,
-          text: "Please configure your Google Gemini API key to enable enhanced fitness coaching features.",
-          isUser: false,
-          timestamp: new Date()
-        };
-        setMessages(prev => [...prev, noApiKeyMessage]);
-        setApiKeyDialogOpen(true);
-      }, 800);
-      return;
-    }
     
     // Add loading message
     const loadingId = messages.length + 2;
@@ -135,7 +85,7 @@ const Chatbot = () => {
       );
       toast({
         title: "Error",
-        description: "Failed to get a response from Google Gemini API. Please check your API key and try again.",
+        description: "Failed to get a response from Google Gemini API. Please try again later.",
         variant: "destructive"
       });
     } finally {
@@ -207,42 +157,6 @@ const Chatbot = () => {
                 <MessageSquare className="h-6 w-6 mr-2" />
                 <h2 className="text-xl font-semibold">Fitness Coach</h2>
               </div>
-              
-              <Dialog open={apiKeyDialogOpen} onOpenChange={setApiKeyDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="ghost" size="sm" className="text-white hover:bg-[#3D9DA1]/90">
-                    <Key className="h-4 w-4 mr-2" />
-                    {apiKey ? "API Key ✓" : "Set API Key"}
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Set Google Gemini API Key</DialogTitle>
-                    <DialogDescription>
-                      Enter your Google Gemini API key to enable fitness coaching features.
-                      This key will be stored locally in your browser.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="py-4">
-                    <Input
-                      placeholder="Enter your Google Gemini API key"
-                      value={tempApiKey}
-                      onChange={(e) => setTempApiKey(e.target.value)}
-                      type="password"
-                      className="mb-2"
-                    />
-                    <p className="text-xs text-gray-500">
-                      Your API key is stored locally and never sent to our servers.
-                    </p>
-                  </div>
-                  <DialogFooter>
-                    <Button variant="outline" onClick={() => setApiKeyDialogOpen(false)}>
-                      Cancel
-                    </Button>
-                    <Button onClick={handleSaveApiKey}>Save</Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
             </div>
           </div>
           
