@@ -1,9 +1,19 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { MessageSquare, Send } from "lucide-react";
+import { MessageSquare, Send, Key } from "lucide-react";
+import { 
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { useToast } from "@/components/ui/toast";
 
 interface Message {
   id: number;
@@ -30,8 +40,34 @@ const Chatbot = () => {
   ]);
   
   const [inputValue, setInputValue] = useState("");
+  const [apiKey, setApiKey] = useState<string>(() => {
+    return localStorage.getItem("googleApiKey") || "";
+  });
+  const [tempApiKey, setTempApiKey] = useState("");
+  const [apiKeyDialogOpen, setApiKeyDialogOpen] = useState(false);
+  const { toast } = useToast();
   
-  const handleSendMessage = (text: string = inputValue) => {
+  useEffect(() => {
+    // Check if API key exists on component mount
+    const savedApiKey = localStorage.getItem("googleApiKey");
+    if (savedApiKey) {
+      setApiKey(savedApiKey);
+    }
+  }, []);
+
+  const handleSaveApiKey = () => {
+    if (tempApiKey.trim()) {
+      localStorage.setItem("googleApiKey", tempApiKey.trim());
+      setApiKey(tempApiKey.trim());
+      setApiKeyDialogOpen(false);
+      toast({
+        title: "API Key Saved",
+        description: "Your API key has been securely saved in your browser.",
+      });
+    }
+  };
+  
+  const handleSendMessage = async (text: string = inputValue) => {
     if (!text.trim()) return;
     
     // Add user message
@@ -45,16 +81,76 @@ const Chatbot = () => {
     setMessages(prev => [...prev, userMessage]);
     setInputValue("");
     
-    // Simulate AI response
-    setTimeout(() => {
-      const aiMessage: Message = {
-        id: messages.length + 2,
-        text: getAiResponse(text),
-        isUser: false,
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, aiMessage]);
-    }, 800);
+    // Check if API key is available
+    if (!apiKey) {
+      setTimeout(() => {
+        const noApiKeyMessage: Message = {
+          id: messages.length + 2,
+          text: "Please configure your Google API key to enable enhanced health coaching features.",
+          isUser: false,
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, noApiKeyMessage]);
+        setApiKeyDialogOpen(true);
+      }, 800);
+      return;
+    }
+    
+    // Add loading message
+    const loadingId = messages.length + 2;
+    const loadingMessage: Message = {
+      id: loadingId,
+      text: "Thinking...",
+      isUser: false,
+      timestamp: new Date()
+    };
+    
+    setMessages(prev => [...prev, loadingMessage]);
+    
+    try {
+      // Here we would make the actual API call using the apiKey
+      // For now, we'll simulate a response after a delay
+      setTimeout(() => {
+        const aiResponse = getAiResponse(text);
+        
+        // Replace loading message with actual response
+        setMessages(prev => 
+          prev.map(msg => 
+            msg.id === loadingId 
+              ? { ...msg, text: aiResponse } 
+              : msg
+          )
+        );
+      }, 1500);
+      
+      // When implementing the actual Google API call, you would do something like:
+      // const response = await fetch('https://api.google.com/v1/endpoint', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Authorization': `Bearer ${apiKey}`,
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify({ query: text }),
+      // });
+      // const data = await response.json();
+      // setMessages(prev => 
+      //   prev.map(msg => 
+      //     msg.id === loadingId 
+      //       ? { ...msg, text: data.response } 
+      //       : msg
+      //   )
+      // );
+      
+    } catch (error) {
+      console.error("Error getting response:", error);
+      setMessages(prev => 
+        prev.map(msg => 
+          msg.id === loadingId 
+            ? { ...msg, text: "Sorry, I encountered an error. Please try again." } 
+            : msg
+        )
+      );
+    }
   };
   
   const getAiResponse = (userMessage: string): string => {
@@ -81,9 +177,47 @@ const Chatbot = () => {
       <Card className="border-0 shadow-md">
         <CardContent className="p-0">
           <div className="bg-[#3D9DA1] p-4 rounded-t-lg">
-            <div className="flex items-center text-white">
-              <MessageSquare className="h-6 w-6 mr-2" />
-              <h2 className="text-xl font-semibold">Health Coach</h2>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center text-white">
+                <MessageSquare className="h-6 w-6 mr-2" />
+                <h2 className="text-xl font-semibold">Health Coach</h2>
+              </div>
+              
+              <Dialog open={apiKeyDialogOpen} onOpenChange={setApiKeyDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="sm" className="text-white hover:bg-[#3D9DA1]/90">
+                    <Key className="h-4 w-4 mr-2" />
+                    {apiKey ? "API Key ✓" : "Set API Key"}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Set Google API Key</DialogTitle>
+                    <DialogDescription>
+                      Enter your Google API key to enable enhanced health coaching features.
+                      This key will be stored locally in your browser.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="py-4">
+                    <Input
+                      placeholder="Enter your Google API key"
+                      value={tempApiKey}
+                      onChange={(e) => setTempApiKey(e.target.value)}
+                      type="password"
+                      className="mb-2"
+                    />
+                    <p className="text-xs text-gray-500">
+                      Your API key is stored locally and never sent to our servers.
+                    </p>
+                  </div>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setApiKeyDialogOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button onClick={handleSaveApiKey}>Save</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
           
