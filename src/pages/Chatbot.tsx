@@ -23,17 +23,17 @@ interface Message {
 }
 
 const presetButtons = [
-  "Get activity tips",
-  "Create a wellness plan",
-  "How's my health?",
-  "Set a reminder"
+  "Get fitness tips",
+  "Create a workout plan",
+  "How can I improve my form?",
+  "Nutrition advice"
 ];
 
 const Chatbot = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
-      text: "Welcome! I'm here to help with your wellness goals using your health data. How can I assist you today?",
+      text: "Welcome! I'm your fitness coach powered by Google Gemini AI. How can I help with your fitness journey today?",
       isUser: false,
       timestamp: new Date()
     }
@@ -45,6 +45,7 @@ const Chatbot = () => {
   });
   const [tempApiKey, setTempApiKey] = useState("");
   const [apiKeyDialogOpen, setApiKeyDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   
   useEffect(() => {
@@ -52,6 +53,9 @@ const Chatbot = () => {
     const savedApiKey = localStorage.getItem("googleApiKey");
     if (savedApiKey) {
       setApiKey(savedApiKey);
+    } else {
+      // Open dialog if no API key is found
+      setApiKeyDialogOpen(true);
     }
   }, []);
 
@@ -62,7 +66,7 @@ const Chatbot = () => {
       setApiKeyDialogOpen(false);
       toast({
         title: "API Key Saved",
-        description: "Your API key has been securely saved in your browser.",
+        description: "Your Google Gemini API key has been securely saved in your browser.",
       });
     }
   };
@@ -86,7 +90,7 @@ const Chatbot = () => {
       setTimeout(() => {
         const noApiKeyMessage: Message = {
           id: messages.length + 2,
-          text: "Please configure your Google API key to enable enhanced health coaching features.",
+          text: "Please configure your Google Gemini API key to enable enhanced fitness coaching features.",
           isUser: false,
           timestamp: new Date()
         };
@@ -106,73 +110,94 @@ const Chatbot = () => {
     };
     
     setMessages(prev => [...prev, loadingMessage]);
+    setIsLoading(true);
     
     try {
-      // Here we would make the actual API call using the apiKey
-      // For now, we'll simulate a response after a delay
-      setTimeout(() => {
-        const aiResponse = getAiResponse(text);
-        
-        // Replace loading message with actual response
-        setMessages(prev => 
-          prev.map(msg => 
-            msg.id === loadingId 
-              ? { ...msg, text: aiResponse } 
-              : msg
-          )
-        );
-      }, 1500);
+      // Make API call to Google Gemini API
+      const response = await fetchGeminiResponse(text, apiKey);
       
-      // When implementing the actual Google API call, you would do something like:
-      // const response = await fetch('https://api.google.com/v1/endpoint', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Authorization': `Bearer ${apiKey}`,
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify({ query: text }),
-      // });
-      // const data = await response.json();
-      // setMessages(prev => 
-      //   prev.map(msg => 
-      //     msg.id === loadingId 
-      //       ? { ...msg, text: data.response } 
-      //       : msg
-      //   )
-      // );
-      
+      // Replace loading message with actual response
+      setMessages(prev => 
+        prev.map(msg => 
+          msg.id === loadingId 
+            ? { ...msg, text: response } 
+            : msg
+        )
+      );
     } catch (error) {
       console.error("Error getting response:", error);
       setMessages(prev => 
         prev.map(msg => 
           msg.id === loadingId 
-            ? { ...msg, text: "Sorry, I encountered an error. Please try again." } 
+            ? { ...msg, text: "Sorry, I encountered an error communicating with Google Gemini AI. Please try again." } 
             : msg
         )
       );
+      toast({
+        title: "Error",
+        description: "Failed to get a response from Google Gemini API. Please check your API key and try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
   
-  const getAiResponse = (userMessage: string): string => {
-    const lowerCaseMessage = userMessage.toLowerCase();
-    
-    if (lowerCaseMessage.includes("activity") || lowerCaseMessage.includes("tip")) {
-      return "Here's a tip: Try incorporating HIIT workouts into your routine! They're great for maximizing calorie burn in a short time. Start with 20 seconds of intense exercise followed by 10 seconds of rest, repeated for 4 minutes.";
-    } else if (lowerCaseMessage.includes("wellness") || lowerCaseMessage.includes("plan")) {
-      return "I can help you create a personalized wellness plan. Based on your current activity level, I'd recommend starting with 3 workout days per week, focusing on a mix of cardio and strength training.";
-    } else if (lowerCaseMessage.includes("health") || lowerCaseMessage.includes("how am i")) {
-      return "Based on your recent activity data, you're making good progress! Your daily steps are trending upward, and your resting heart rate is stable. Keep up the great work!";
-    } else if (lowerCaseMessage.includes("reminder") || lowerCaseMessage.includes("set")) {
-      return "I've set a reminder for you to workout tomorrow at 7:00 AM. I'll send you a notification when it's time.";
-    } else {
-      return "I'm here to help with your fitness and wellness journey. You can ask me about activity tips, creating a wellness plan, your health status, or setting reminders for your workouts!";
+  const fetchGeminiResponse = async (userMessage: string, key: string): Promise<string> => {
+    try {
+      const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": key
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              role: "user",
+              parts: [
+                {
+                  text: `You are an AI fitness coach. Provide helpful, accurate, and engaging fitness advice. 
+                  Focus only on fitness, exercise, nutrition, and wellness topics. Do not provide medical diagnoses.
+                  Keep responses under 300 words and be motivational. Current user query: ${userMessage}`
+                }
+              ]
+            }
+          ],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 800,
+            topK: 40,
+            topP: 0.95
+          }
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("API Error:", errorData);
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      // Extract the response text from the Gemini API response
+      if (data.candidates && data.candidates[0]?.content?.parts && data.candidates[0].content.parts[0]?.text) {
+        return data.candidates[0].content.parts[0].text;
+      } else {
+        console.error("Unexpected API response format:", data);
+        return "Sorry, I couldn't process that response. Please try again with a different question.";
+      }
+    } catch (error) {
+      console.error("Error in fetchGeminiResponse:", error);
+      throw error;
     }
   };
 
   return (
     <div className="container py-6 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-2">Virtual Health Coach</h1>
-      <p className="text-gray-600 mb-6">Chat with your AI health assistant</p>
+      <h1 className="text-3xl font-bold mb-2">Virtual Fitness Coach</h1>
+      <p className="text-gray-600 mb-6">Chat with your AI fitness assistant powered by Google Gemini</p>
       
       <Card className="border-0 shadow-md">
         <CardContent className="p-0">
@@ -180,7 +205,7 @@ const Chatbot = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center text-white">
                 <MessageSquare className="h-6 w-6 mr-2" />
-                <h2 className="text-xl font-semibold">Health Coach</h2>
+                <h2 className="text-xl font-semibold">Fitness Coach</h2>
               </div>
               
               <Dialog open={apiKeyDialogOpen} onOpenChange={setApiKeyDialogOpen}>
@@ -192,15 +217,15 @@ const Chatbot = () => {
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Set Google API Key</DialogTitle>
+                    <DialogTitle>Set Google Gemini API Key</DialogTitle>
                     <DialogDescription>
-                      Enter your Google API key to enable enhanced health coaching features.
+                      Enter your Google Gemini API key to enable fitness coaching features.
                       This key will be stored locally in your browser.
                     </DialogDescription>
                   </DialogHeader>
                   <div className="py-4">
                     <Input
-                      placeholder="Enter your Google API key"
+                      placeholder="Enter your Google Gemini API key"
                       value={tempApiKey}
                       onChange={(e) => setTempApiKey(e.target.value)}
                       type="password"
@@ -279,7 +304,7 @@ const Chatbot = () => {
                 <Button 
                   type="submit"
                   className="bg-[#3D9DA1] hover:bg-[#3D9DA1]/90"
-                  disabled={!inputValue.trim()}
+                  disabled={!inputValue.trim() || isLoading}
                 >
                   <Send className="h-4 w-4" />
                 </Button>
