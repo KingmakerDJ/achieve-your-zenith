@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -32,8 +31,8 @@ const Chatbot = () => {
   ]);
   
   const [inputValue, setInputValue] = useState("");
-  // Using the provided API key directly
-  const apiKey = "AIzaSyAZKojWKhOW8iX7-W74eWmuAr2YKpb4DCc";
+  // Updated API key
+  const apiKey = "AIzaSyCfbKwlMAeS6lFFieCfP_XoWS0EITnMc7s";
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   
