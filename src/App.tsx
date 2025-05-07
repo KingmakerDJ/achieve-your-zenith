@@ -16,6 +16,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Chatbot from "./pages/Chatbot";
 import WellnessPlan from "./pages/WellnessPlan";
+import NutrientPlan from "./pages/NutrientPlan";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="tracker" element={<Tracker />} />
             <Route path="chatbot" element={<Chatbot />} />
             <Route path="wellness-plan" element={<WellnessPlan />} />
+            <Route path="nutrient-plan" element={<NutrientPlan />} />
             <Route path="profile" element={<Profile />} />
             <Route path="*" element={<NotFound />} />
           </Route>
