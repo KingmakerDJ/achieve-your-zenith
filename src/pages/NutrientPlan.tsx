@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -6,12 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Utensils, Apple, ArrowRight, PieChart } from "lucide-react";
 import NutrientCard from "@/components/NutrientCard";
-import { getNutrientItemsByCategory, getNutrientPlans, NutrientItem, NutrientPlan, getNutrientItemById } from "@/data/nutrientData";
+import { Badge } from "@/components/ui/badge";
+import { getNutrientItemsByCategory, getNutrientPlans, getNutrientItemById } from "@/data/nutrientData";
+import type { NutrientItem, NutrientPlan as NutrientPlanType } from "@/data/nutrientData";
 
 const NutrientPlan = () => {
   const [activeCategory, setActiveCategory] = useState<string>("Protein");
   const [selectedNutrient, setSelectedNutrient] = useState<NutrientItem | null>(null);
-  const [selectedPlan, setSelectedPlan] = useState<NutrientPlan | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<NutrientPlanType | null>(null);
   const [customPlan, setCustomPlan] = useState<NutrientItem[]>([]);
   
   const categories = ["Protein", "Carbs", "Fat", "Vegetables", "Dairy", "Nuts"];
@@ -22,7 +23,7 @@ const NutrientPlan = () => {
     setSelectedNutrient(nutrient);
   };
   
-  const handlePlanSelect = (plan: NutrientPlan) => {
+  const handlePlanSelect = (plan: NutrientPlanType) => {
     setSelectedPlan(plan);
   };
   
