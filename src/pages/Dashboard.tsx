@@ -1,11 +1,18 @@
 
+import { useState } from "react";
 import { Activity, Dumbbell, Heart, Timer, Thermometer } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import StatCard from "@/components/StatCard";
 import WorkoutCard from "@/components/WorkoutCard";
 import ActivityProgress from "@/components/ActivityProgress";
 import ExerciseTimeline from "@/components/ExerciseTimeline";
+import { recommendedWorkouts, getWorkoutVideoById } from "@/data/workoutData";
+import { Button } from "@/components/ui/button";
 
 const Dashboard = () => {
+  const [selectedWorkout, setSelectedWorkout] = useState<any | null>(null);
+  const [showVideoId, setShowVideoId] = useState<string | null>(null);
+  
   const timelineItems = [
     {
       time: "Today, 6:30 AM",
@@ -26,6 +33,16 @@ const Dashboard = () => {
       icon: "heart" as const
     }
   ];
+
+  const handleWorkoutSelect = (workout: any) => {
+    setSelectedWorkout(workout);
+  };
+
+  const handleShowVideo = (videoId: string) => {
+    setShowVideoId(videoId);
+    // Close workout detail if open
+    setSelectedWorkout(null);
+  };
 
   return (
     <div className="container py-6">
@@ -72,20 +89,17 @@ const Dashboard = () => {
               <a href="/workouts" className="text-sm text-fitness-primary hover:underline">View all</a>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <WorkoutCard 
-                title="Morning HIIT"
-                category="Cardio"
-                duration="25 min"
-                intensity="Medium"
-                image="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-              />
-              <WorkoutCard 
-                title="Full Body Power"
-                category="Strength"
-                duration="45 min"
-                intensity="Hard"
-                image="https://images.unsplash.com/photo-1603287681836-b174ce5074c2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-              />
+              {recommendedWorkouts.slice(0, 2).map((workout) => (
+                <WorkoutCard 
+                  key={workout.id}
+                  title={workout.title}
+                  category={workout.category}
+                  duration={workout.duration}
+                  intensity={workout.intensity as "Easy" | "Medium" | "Hard"}
+                  image={workout.image}
+                  onClick={() => handleWorkoutSelect(workout)}
+                />
+              ))}
             </div>
           </div>
           
@@ -125,6 +139,105 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+      
+      {/* Workout Detail Dialog */}
+      <Dialog open={!!selectedWorkout} onOpenChange={(open) => !open && setSelectedWorkout(null)}>
+        <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-auto">
+          {selectedWorkout && (
+            <>
+              <DialogHeader>
+                <DialogTitle>{selectedWorkout.title}</DialogTitle>
+                <DialogDescription>
+                  {selectedWorkout.description}
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="space-y-4 my-4">
+                <div className="flex flex-wrap gap-2">
+                  <span className="bg-slate-100 py-1 px-2 rounded-md text-xs">{selectedWorkout.category}</span>
+                  <span className="text-xs bg-slate-100 py-1 px-2 rounded">{selectedWorkout.duration}</span>
+                  <span className={`text-xs py-1 px-2 rounded-full ${
+                    selectedWorkout.intensity === "Easy" 
+                      ? "bg-green-100 text-green-800" 
+                      : selectedWorkout.intensity === "Medium" 
+                      ? "bg-yellow-100 text-yellow-800" 
+                      : "bg-red-100 text-red-800"
+                  }`}>
+                    {selectedWorkout.intensity}
+                  </span>
+                </div>
+                
+                <h3 className="font-medium">Exercises</h3>
+                <div className="space-y-2">
+                  {selectedWorkout.exercises.map((exercise: any, index: number) => (
+                    <div key={index} className="flex justify-between items-center p-3 bg-slate-50 rounded-md">
+                      <div>
+                        <p className="font-medium">{exercise.name}</p>
+                        <p className="text-sm text-gray-600">{exercise.sets} sets × {exercise.reps}</p>
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => handleShowVideo(exercise.videoId)}
+                      >
+                        Watch Demo
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+      
+      {/* Video Dialog */}
+      <Dialog open={!!showVideoId} onOpenChange={(open) => !open && setShowVideoId(null)}>
+        <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-auto">
+          {showVideoId && (() => {
+            const video = getWorkoutVideoById(showVideoId);
+            if (!video) return null;
+            
+            return (
+              <>
+                <DialogHeader>
+                  <DialogTitle>{video.title}</DialogTitle>
+                  <DialogDescription>
+                    {video.caption}
+                  </DialogDescription>
+                </DialogHeader>
+                
+                <div className="aspect-video w-full my-2">
+                  <iframe
+                    src={video.videoUrl}
+                    title={video.title}
+                    className="w-full h-full"
+                    allowFullScreen
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  ></iframe>
+                </div>
+                
+                <div className="flex items-center gap-2 my-2 flex-wrap">
+                  <span className="bg-slate-100 py-1 px-2 rounded-md text-xs">{video.category}</span>
+                  {video.bodyPart && video.bodyPart !== video.category && (
+                    <span className="bg-slate-100 py-1 px-2 rounded-md text-xs">{video.bodyPart}</span>
+                  )}
+                  <span className={`text-xs py-1 px-2 rounded-full ${
+                    video.intensity === "Easy" 
+                      ? "bg-green-100 text-green-800" 
+                      : video.intensity === "Medium" 
+                      ? "bg-yellow-100 text-yellow-800" 
+                      : "bg-red-100 text-red-800"
+                  }`}>
+                    {video.intensity}
+                  </span>
+                  <span className="text-xs bg-slate-100 py-1 px-2 rounded ml-auto">{video.duration}</span>
+                </div>
+              </>
+            );
+          })()}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -12,6 +12,8 @@ export interface WorkoutVideoProps {
   intensity: "Easy" | "Medium" | "Hard";
   thumbnailUrl: string;
   videoUrl: string;
+  bodyPart?: string;
+  caption?: string;
 }
 
 const WorkoutVideo = ({
@@ -20,7 +22,9 @@ const WorkoutVideo = ({
   duration,
   intensity,
   thumbnailUrl,
-  videoUrl
+  videoUrl,
+  bodyPart,
+  caption
 }: WorkoutVideoProps) => {
   const [showVideo, setShowVideo] = useState(false);
 
@@ -61,8 +65,11 @@ const WorkoutVideo = ({
       </div>
       <CardContent className="pt-4 flex-grow">
         <h3 className="font-semibold text-lg mb-1">{title}</h3>
-        <div className="flex items-center gap-2 mb-2">
+        <div className="flex items-center gap-2 mb-2 flex-wrap">
           <span className="bg-slate-100 py-1 px-2 rounded-md text-xs">{category}</span>
+          {bodyPart && bodyPart !== category && (
+            <span className="bg-slate-100 py-1 px-2 rounded-md text-xs">{bodyPart}</span>
+          )}
           <span className={`text-xs py-1 px-2 rounded-full ${
             intensity === "Easy" 
               ? "bg-green-100 text-green-800" 
@@ -73,6 +80,9 @@ const WorkoutVideo = ({
             {intensity}
           </span>
         </div>
+        {caption && (
+          <p className="text-sm text-gray-600">{caption}</p>
+        )}
       </CardContent>
     </Card>
   );

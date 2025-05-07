@@ -8,11 +8,12 @@ interface WorkoutCardProps {
   duration: string;
   intensity: "Easy" | "Medium" | "Hard";
   image: string;
+  onClick?: () => void;
 }
 
-const WorkoutCard = ({ title, category, duration, intensity, image }: WorkoutCardProps) => {
+const WorkoutCard = ({ title, category, duration, intensity, image, onClick }: WorkoutCardProps) => {
   return (
-    <div className="workout-card h-64">
+    <div className="workout-card h-64 relative cursor-pointer" onClick={onClick}>
       <img 
         src={image} 
         alt={title} 
