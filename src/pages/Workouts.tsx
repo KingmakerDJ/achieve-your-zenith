@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -6,7 +5,7 @@ import WorkoutVideo from "@/components/WorkoutVideo";
 import { getWorkoutVideos, getRecommendedWorkouts, getWorkoutVideoById } from "@/data/workoutData";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
-import { Grid3x3, List } from "lucide-react";
+import { Grid3x3, List, Play } from "lucide-react";
 
 const Workouts = () => {
   const [activeTab, setActiveTab] = useState("all");
