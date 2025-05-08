@@ -1,11 +1,12 @@
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { MessageSquare, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Textarea } from "@/components/ui/textarea";
 
 interface Message {
   id: number;
@@ -44,11 +45,21 @@ const Chatbot = () => {
   ]);
   
   const [inputValue, setInputValue] = useState("");
-  // Using fallback mode by default to ensure chatbot always works
+  // Using default API key but attempting to use the API first
   const apiKey = "AIzaSyCfbKwlMAeS6lFFieCfP_XoWS0EITnMc7s";
   const [isLoading, setIsLoading] = useState(false);
-  const [apiError, setApiError] = useState(true); // Set to true to use fallbacks by default
+  const [apiError, setApiError] = useState(false); // Set to false to attempt API call first
   const { toast } = useToast();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // Auto-scroll to bottom of messages
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+  
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
   
   const handleSendMessage = async (text: string = inputValue) => {
     if (!text.trim()) return;
@@ -95,10 +106,13 @@ const Chatbot = () => {
         return;
       }
       
-      // If not a preset and API is working, try the API
-      if (!apiError) {
-        // Make API call to Google Gemini API
+      // Try the API first - only use fallback if it fails
+      try {
+        // Make API call to Google Gemini API with proper error handling
         const response = await fetchGeminiResponse(text, apiKey);
+        
+        // If we get here, API worked successfully
+        setApiError(false);
         
         // Replace loading message with actual response
         setMessages(prev => 
@@ -108,18 +122,30 @@ const Chatbot = () => {
               : msg
           )
         );
-      } else {
-        // API error mode - provide generic response
-        setTimeout(() => {
-          setMessages(prev => 
-            prev.map(msg => 
-              msg.id === loadingId 
-                ? { ...msg, text: "Thanks for your question! I'm currently operating in offline mode. Please try one of the preset questions for the best experience.", structured: false } 
-                : msg
-            )
-          );
-          setIsLoading(false);
-        }, 1000);
+        
+        // API is working well, show success toast
+        toast({
+          title: "AI Assistant Online",
+          description: "Connected to Google Gemini AI successfully.",
+        });
+      } catch (error) {
+        console.error("Gemini API Error:", error);
+        setApiError(true);
+        
+        // API failed, use fallback response
+        setMessages(prev => 
+          prev.map(msg => 
+            msg.id === loadingId 
+              ? { ...msg, text: "Thanks for your question! I'm currently operating in offline mode. Please try one of the preset questions for the best experience.", structured: false } 
+              : msg
+          )
+        );
+        
+        toast({
+          title: "AI Assistant Error",
+          description: "Using fallback responses until service is available again.",
+          variant: "destructive"
+        });
       }
     } catch (error) {
       console.error("Error getting response:", error);
@@ -133,11 +159,6 @@ const Chatbot = () => {
       );
       
       setApiError(true);
-      toast({
-        title: "AI Assistant Error",
-        description: "Using fallback responses until service is available again.",
-        variant: "destructive"
-      });
     } finally {
       setIsLoading(false);
     }
@@ -177,7 +198,9 @@ const Chatbot = () => {
             topK: 40,
             topP: 0.95
           }
-        })
+        }),
+        // Add timeout to avoid hanging requests
+        signal: AbortSignal.timeout(10000)
       });
 
       if (!response.ok) {
@@ -290,7 +313,7 @@ const Chatbot = () => {
             </div>
           </div>
           
-          <div className="h-[60vh] flex flex-col">
+          <div className="flex flex-col h-[70vh]">
             {/* Chat messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.map(message => (
@@ -315,25 +338,28 @@ const Chatbot = () => {
                   </div>
                 </div>
               ))}
+              <div ref={messagesEndRef} /> {/* Scroll anchor */}
             </div>
             
-            {/* Preset buttons */}
-            <div className="p-4 border-t grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {presetButtons.map(text => (
-                <Button 
-                  key={text} 
-                  variant="outline" 
-                  onClick={() => handleSendMessage(text)}
-                  disabled={isLoading}
-                  className="text-left justify-start h-auto py-3 border-gray-200 hover:bg-gray-50 hover:text-[#3D9DA1]"
-                >
-                  {text}
-                </Button>
-              ))}
+            {/* Preset buttons - made scrollable on small screens */}
+            <div className="p-4 border-t overflow-x-auto">
+              <div className="flex flex-wrap gap-2">
+                {presetButtons.map(text => (
+                  <Button 
+                    key={text} 
+                    variant="outline" 
+                    onClick={() => handleSendMessage(text)}
+                    disabled={isLoading}
+                    className="whitespace-nowrap text-left justify-start h-auto py-3 border-gray-200 hover:bg-gray-50 hover:text-[#3D9DA1] text-sm md:text-base"
+                  >
+                    {text}
+                  </Button>
+                ))}
+              </div>
             </div>
             
-            {/* Input area */}
-            <div className="p-4 border-t mt-auto">
+            {/* Input area - made more visible and responsive */}
+            <div className="p-4 border-t mt-auto bg-gray-50">
               <form 
                 className="flex gap-2" 
                 onSubmit={(e) => {
@@ -341,16 +367,23 @@ const Chatbot = () => {
                   handleSendMessage();
                 }}
               >
-                <Input 
+                <Textarea 
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder="Type your message..."
-                  className="flex-1"
+                  className="flex-1 min-h-[50px] max-h-[120px] resize-none"
                   disabled={isLoading}
+                  rows={1}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendMessage();
+                    }
+                  }}
                 />
                 <Button 
                   type="submit"
-                  className="bg-[#3D9DA1] hover:bg-[#3D9DA1]/90"
+                  className="bg-[#3D9DA1] hover:bg-[#3D9DA1]/90 h-auto px-4"
                   disabled={!inputValue.trim() || isLoading}
                 >
                   <Send className="h-4 w-4" />
