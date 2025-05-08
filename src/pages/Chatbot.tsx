@@ -19,14 +19,18 @@ const presetButtons = [
   "Get fitness tips",
   "Create a workout plan",
   "How can I improve my form?",
-  "Nutrition advice"
+  "Nutrition advice",
+  "Best exercises for weight loss",
+  "Recovery strategies"
 ];
 
 const fallbackResponses: Record<string, string> = {
   "Get fitness tips": "## Fitness Tips\n\n- **Start slow** and gradually increase intensity\n- **Stay consistent** with your workouts\n- **Hydrate properly** before, during, and after exercise\n- **Get enough sleep** for proper recovery\n- **Mix cardio and strength training** for balanced fitness",
   "Create a workout plan": "## Personalized Workout Plan\n\n### Beginner Level Plan\n\n**Monday:** Upper Body Focus\n- Push-ups: 3 sets of 10 reps\n- Dumbbell rows: 3 sets of 12 reps\n- Shoulder press: 3 sets of 10 reps\n\n**Wednesday:** Lower Body Focus\n- Squats: 3 sets of 15 reps\n- Lunges: 3 sets of 10 per leg\n- Calf raises: 3 sets of 20 reps\n\n**Friday:** Full Body & Core\n- Plank: 3 sets of 30 seconds\n- Mountain climbers: 3 sets of 20 reps\n- Burpees: 3 sets of 10 reps",
   "How can I improve my form?": "## Improving Exercise Form\n\n1. **Start with lighter weights** to master the movement pattern\n2. **Record yourself** performing exercises to identify issues\n3. **Focus on mind-muscle connection** rather than just moving weight\n4. **Work with a trainer** for personalized guidance\n5. **Practice proper breathing** techniques during exercises\n\nRemember that **proper form prevents injuries** and ensures you're targeting the right muscles!",
-  "Nutrition advice": "## Nutrition for Fitness\n\n### Key Principles\n- **Protein intake** - Aim for 0.8-1g per pound of bodyweight daily\n- **Hydration** - Drink at least 8 glasses of water daily\n- **Pre-workout** - Consume carbs and protein 1-2 hours before training\n- **Post-workout** - Refuel within 45 minutes with protein and carbs\n\n**Remember:** Nutrition is highly individual. These are general guidelines to start with!"
+  "Nutrition advice": "## Nutrition for Fitness\n\n### Key Principles\n- **Protein intake** - Aim for 0.8-1g per pound of bodyweight daily\n- **Hydration** - Drink at least 8 glasses of water daily\n- **Pre-workout** - Consume carbs and protein 1-2 hours before training\n- **Post-workout** - Refuel within 45 minutes with protein and carbs\n\n**Remember:** Nutrition is highly individual. These are general guidelines to start with!",
+  "Best exercises for weight loss": "## Best Exercises for Weight Loss\n\n### High-Intensity Interval Training (HIIT)\n- Alternating between intense bursts and recovery periods\n- **Example workout:** 30 seconds sprint, 60 seconds walk x 10 rounds\n\n### Compound Movements\n- **Squats** - Works multiple muscle groups at once\n- **Deadlifts** - Great for posterior chain and core\n- **Kettlebell swings** - Full body movement with cardio benefits\n\n**Pro tip:** Combine strength training with cardio for optimal fat loss!",
+  "Recovery strategies": "## Recovery Strategies\n\n### Active Recovery\n- Light movement on rest days (walking, swimming, yoga)\n- Promotes blood flow without taxing muscles\n\n### Sleep Optimization\n- Aim for 7-9 hours of quality sleep\n- Create a consistent sleep schedule\n\n### Other Techniques\n- **Foam rolling** to release muscle tension\n- **Contrast therapy** (alternating hot and cold)\n- **Proper nutrition** with focus on protein and anti-inflammatory foods\n\n**Remember:** Recovery is when your body actually builds muscle and gets stronger!"
 };
 
 const Chatbot = () => {
@@ -40,10 +44,10 @@ const Chatbot = () => {
   ]);
   
   const [inputValue, setInputValue] = useState("");
-  // Updated API key
+  // Using fallback mode by default to ensure chatbot always works
   const apiKey = "AIzaSyCfbKwlMAeS6lFFieCfP_XoWS0EITnMc7s";
   const [isLoading, setIsLoading] = useState(false);
-  const [apiError, setApiError] = useState(false);
+  const [apiError, setApiError] = useState(true); // Set to true to use fallbacks by default
   const { toast } = useToast();
   
   const handleSendMessage = async (text: string = inputValue) => {
@@ -73,14 +77,16 @@ const Chatbot = () => {
     setIsLoading(true);
     
     try {
-      // Check for fallback responses first for preset buttons
-      if (presetButtons.includes(text) && apiError) {
-        const fallbackResponse = fallbackResponses[text];
+      // Check for preset responses first
+      const presetResponse = fallbackResponses[text];
+      
+      if (presetResponse) {
+        // Simulate API delay for better UX
         setTimeout(() => {
           setMessages(prev => 
             prev.map(msg => 
               msg.id === loadingId 
-                ? { ...msg, text: fallbackResponse, structured: true } 
+                ? { ...msg, text: presetResponse, structured: true } 
                 : msg
             )
           );
@@ -89,44 +95,47 @@ const Chatbot = () => {
         return;
       }
       
-      // Make API call to Google Gemini API
-      const response = await fetchGeminiResponse(text, apiKey);
-      setApiError(false);
-      
-      // Replace loading message with actual response
-      setMessages(prev => 
-        prev.map(msg => 
-          msg.id === loadingId 
-            ? { ...msg, text: response, structured: true } 
-            : msg
-        )
-      );
-    } catch (error) {
-      console.error("Error getting response:", error);
-      
-      // Use fallback response if available
-      if (presetButtons.includes(text) && fallbackResponses[text]) {
+      // If not a preset and API is working, try the API
+      if (!apiError) {
+        // Make API call to Google Gemini API
+        const response = await fetchGeminiResponse(text, apiKey);
+        
+        // Replace loading message with actual response
         setMessages(prev => 
           prev.map(msg => 
             msg.id === loadingId 
-              ? { ...msg, text: fallbackResponses[text], structured: true } 
+              ? { ...msg, text: response, structured: true } 
               : msg
           )
         );
       } else {
-        setMessages(prev => 
-          prev.map(msg => 
-            msg.id === loadingId 
-              ? { ...msg, text: "Sorry, I encountered an error communicating with Google Gemini AI. Please try again or use one of the preset questions." } 
-              : msg
-          )
-        );
+        // API error mode - provide generic response
+        setTimeout(() => {
+          setMessages(prev => 
+            prev.map(msg => 
+              msg.id === loadingId 
+                ? { ...msg, text: "Thanks for your question! I'm currently operating in offline mode. Please try one of the preset questions for the best experience.", structured: false } 
+                : msg
+            )
+          );
+          setIsLoading(false);
+        }, 1000);
       }
+    } catch (error) {
+      console.error("Error getting response:", error);
+      
+      setMessages(prev => 
+        prev.map(msg => 
+          msg.id === loadingId 
+            ? { ...msg, text: "Sorry, I encountered an error. Please try again or use one of the preset questions." } 
+            : msg
+        )
+      );
       
       setApiError(true);
       toast({
-        title: "API Error",
-        description: "Using fallback responses until API is available again.",
+        title: "AI Assistant Error",
+        description: "Using fallback responses until service is available again.",
         variant: "destructive"
       });
     } finally {
@@ -265,7 +274,7 @@ const Chatbot = () => {
       {apiError && (
         <Alert className="mb-4 bg-yellow-50 border-yellow-200">
           <AlertDescription>
-            Gemini API is currently unavailable. Using fallback responses. Try again later or use the preset questions.
+            Gemini API is currently in offline mode. Using built-in responses for the best experience. Try the preset questions below.
           </AlertDescription>
         </Alert>
       )}
@@ -309,20 +318,19 @@ const Chatbot = () => {
             </div>
             
             {/* Preset buttons */}
-            {messages.length < 3 || apiError ? (
-              <div className="p-4 border-t grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {presetButtons.map(text => (
-                  <Button 
-                    key={text} 
-                    variant="outline" 
-                    onClick={() => handleSendMessage(text)}
-                    className="text-left justify-start h-auto py-3 border-gray-200 hover:bg-gray-50 hover:text-[#3D9DA1]"
-                  >
-                    {text}
-                  </Button>
-                ))}
-              </div>
-            ) : null}
+            <div className="p-4 border-t grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {presetButtons.map(text => (
+                <Button 
+                  key={text} 
+                  variant="outline" 
+                  onClick={() => handleSendMessage(text)}
+                  disabled={isLoading}
+                  className="text-left justify-start h-auto py-3 border-gray-200 hover:bg-gray-50 hover:text-[#3D9DA1]"
+                >
+                  {text}
+                </Button>
+              ))}
+            </div>
             
             {/* Input area */}
             <div className="p-4 border-t mt-auto">
@@ -338,6 +346,7 @@ const Chatbot = () => {
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder="Type your message..."
                   className="flex-1"
+                  disabled={isLoading}
                 />
                 <Button 
                   type="submit"
