@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import WorkoutVideo from "@/components/WorkoutVideo";
+import WorkoutCard from "@/components/WorkoutCard";
 import { getWorkoutVideos, getRecommendedWorkouts, getWorkoutVideoById } from "@/data/workoutData";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
@@ -29,6 +30,37 @@ const Workouts = () => {
     setShowVideoId(videoId);
     // Close workout detail if open
     setSelectedWorkout(null);
+  };
+
+  // Create workout cards for each category
+  const renderWorkoutCards = () => {
+    const categoriesToShow = ['all', 'chest', 'back', 'legs', 'shoulders', 'arms', 'core'];
+    
+    return categoriesToShow.map(category => {
+      // Get the first two videos of each category for cards
+      const videos = getWorkoutVideos(category).slice(0, 2);
+      
+      if (videos.length === 0) return null;
+      
+      return (
+        <div key={category} className="mb-8">
+          <h2 className="text-xl font-bold mb-4 capitalize">{category === 'all' ? 'Featured Workouts' : category}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {videos.map((video) => (
+              <WorkoutCard
+                key={video.id}
+                title={video.title}
+                category={video.category}
+                duration={video.duration}
+                intensity={video.intensity}
+                image={video.thumbnailUrl}
+                onClick={() => handleShowVideo(video.id)}
+              />
+            ))}
+          </div>
+        </div>
+      );
+    }).filter(Boolean);
   };
 
   return (
@@ -77,6 +109,11 @@ const Workouts = () => {
           </Dialog>
         </div>
       </div>
+      
+      {/* Display workout cards for each category at the top */}
+      <section className="mb-10">
+        {renderWorkoutCards()}
+      </section>
       
       <Tabs defaultValue="all" className="w-full" onValueChange={handleTabChange}>
         <TabsList className="mb-6">

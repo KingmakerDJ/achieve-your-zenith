@@ -34,12 +34,13 @@ const Navbar = () => {
             <Link
               key={link.path}
               to={link.path}
-              className={`text-sm font-medium transition-colors ${
+              className={`text-sm font-medium transition-colors flex items-center gap-1 ${
                 location.pathname === link.path
                   ? "text-[#3D9DA1]"
                   : "hover:text-[#3D9DA1]"
               }`}
             >
+              {link.icon}
               {link.label}
             </Link>
           ))}
