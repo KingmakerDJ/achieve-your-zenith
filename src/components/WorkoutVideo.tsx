@@ -27,6 +27,23 @@ const WorkoutVideo = ({
   caption
 }: WorkoutVideoProps) => {
   const [showVideo, setShowVideo] = useState(false);
+  
+  // Function to get appropriate thumbnail based on category if the provided image isn't specific
+  const getAppropriateImage = (category: string, providedImage: string) => {
+    // Only use these fallbacks if the image looks like a generic placeholder
+    if (providedImage.includes("unsplash") && !providedImage.includes("workout")) {
+      switch(category.toLowerCase()) {
+        case 'chest': return "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+        case 'back': return "https://images.unsplash.com/photo-1604047934811-8651171faebd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+        case 'legs': return "https://images.unsplash.com/photo-1566241440091-ec10de8db2e1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+        case 'shoulders': return "https://images.unsplash.com/photo-1530822847156-5df684ec5ee1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+        case 'arms': return "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+        case 'core': return "https://images.unsplash.com/photo-1607962837359-5e7e89f86776?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+        default: return providedImage;
+      }
+    }
+    return providedImage;
+  };
 
   return (
     <Card className="overflow-hidden h-full flex flex-col">
@@ -44,7 +61,7 @@ const WorkoutVideo = ({
         ) : (
           <div className="aspect-video relative overflow-hidden">
             <img
-              src={thumbnailUrl}
+              src={getAppropriateImage(category, thumbnailUrl)}
               alt={title}
               className="w-full h-full object-cover"
             />
