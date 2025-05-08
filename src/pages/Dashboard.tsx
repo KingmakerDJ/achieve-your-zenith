@@ -1,13 +1,15 @@
 
 import { useState } from "react";
-import { Activity, Dumbbell, Heart, Timer, Thermometer } from "lucide-react";
+import { Activity, Dumbbell, Heart, Timer, Thermometer, Apple, ArrowRight } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import StatCard from "@/components/StatCard";
 import WorkoutCard from "@/components/WorkoutCard";
 import ActivityProgress from "@/components/ActivityProgress";
 import ExerciseTimeline from "@/components/ExerciseTimeline";
 import { recommendedWorkouts, getWorkoutVideoById } from "@/data/workoutData";
+import { getNutrientItemsByCategory } from "@/data/nutrientData";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const Dashboard = () => {
   const [selectedWorkout, setSelectedWorkout] = useState<any | null>(null);
@@ -33,6 +35,10 @@ const Dashboard = () => {
       icon: "heart" as const
     }
   ];
+
+  // Get nutrient items for the dashboard preview
+  const proteinItems = getNutrientItemsByCategory("Protein").slice(0, 3);
+  const carbsItems = getNutrientItemsByCategory("Carbs").slice(0, 3);
 
   const handleWorkoutSelect = (workout: any) => {
     setSelectedWorkout(workout);
@@ -86,7 +92,7 @@ const Dashboard = () => {
           <div>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Recommended Workouts</h2>
-              <a href="/workouts" className="text-sm text-fitness-primary hover:underline">View all</a>
+              <Link to="/workouts" className="text-sm text-fitness-primary hover:underline">View all</Link>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {recommendedWorkouts.slice(0, 2).map((workout) => (
@@ -127,6 +133,55 @@ const Dashboard = () => {
                 unit="kcal"
                 color="bg-fitness-accent"
               />
+            </div>
+          </div>
+
+          {/* Nutrient Section */}
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Nutrition Tracker</h2>
+              <Link to="/nutrient-plan" className="text-sm text-fitness-primary hover:underline">View full plan</Link>
+            </div>
+            <div className="bg-white rounded-lg shadow-sm border p-4">
+              <div className="flex items-center mb-4">
+                <Apple className="h-5 w-5 text-green-500 mr-2" />
+                <h3 className="font-medium">Today's Nutrition</h3>
+              </div>
+              
+              <div className="flex flex-wrap -mx-2">
+                <div className="w-full md:w-1/2 px-2 mb-4">
+                  <h4 className="text-sm font-medium mb-2">Suggested Proteins</h4>
+                  <div className="space-y-2">
+                    {proteinItems.map((item) => (
+                      <div key={item.id} className="flex justify-between items-center p-2 bg-slate-50 rounded">
+                        <span className="font-medium text-sm">{item.name}</span>
+                        <span className="text-xs text-gray-500">{item.protein}g protein</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="w-full md:w-1/2 px-2 mb-4">
+                  <h4 className="text-sm font-medium mb-2">Suggested Carbs</h4>
+                  <div className="space-y-2">
+                    {carbsItems.map((item) => (
+                      <div key={item.id} className="flex justify-between items-center p-2 bg-slate-50 rounded">
+                        <span className="font-medium text-sm">{item.name}</span>
+                        <span className="text-xs text-gray-500">{item.carbs}g carbs</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-2">
+                <Link to="/nutrient-plan">
+                  <Button variant="outline" size="sm" className="w-full">
+                    View Complete Nutrition Plan
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         </div>

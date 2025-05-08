@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Dumbbell, User, Menu, MessageSquare, CalendarCheck, Activity } from "lucide-react";
+import { Dumbbell, User, Menu, MessageSquare, CalendarCheck, Activity, Apple } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
@@ -14,6 +14,7 @@ const Navbar = () => {
     { path: "/tracker", label: "Tracker", icon: <Activity className="h-5 w-5" /> },
     { path: "/chatbot", label: "AI Coach", icon: <MessageSquare className="h-5 w-5" /> },
     { path: "/wellness-plan", label: "Wellness Plan", icon: <CalendarCheck className="h-5 w-5" /> },
+    { path: "/nutrient-plan", label: "Nutrients", icon: <Apple className="h-5 w-5" /> },
     { path: "/profile", label: "Profile", icon: <User className="h-5 w-5" /> },
   ];
   

@@ -1,9 +1,11 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { MessageSquare, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface Message {
   id: number;
@@ -20,6 +22,13 @@ const presetButtons = [
   "Nutrition advice"
 ];
 
+const fallbackResponses: Record<string, string> = {
+  "Get fitness tips": "## Fitness Tips\n\n- **Start slow** and gradually increase intensity\n- **Stay consistent** with your workouts\n- **Hydrate properly** before, during, and after exercise\n- **Get enough sleep** for proper recovery\n- **Mix cardio and strength training** for balanced fitness",
+  "Create a workout plan": "## Personalized Workout Plan\n\n### Beginner Level Plan\n\n**Monday:** Upper Body Focus\n- Push-ups: 3 sets of 10 reps\n- Dumbbell rows: 3 sets of 12 reps\n- Shoulder press: 3 sets of 10 reps\n\n**Wednesday:** Lower Body Focus\n- Squats: 3 sets of 15 reps\n- Lunges: 3 sets of 10 per leg\n- Calf raises: 3 sets of 20 reps\n\n**Friday:** Full Body & Core\n- Plank: 3 sets of 30 seconds\n- Mountain climbers: 3 sets of 20 reps\n- Burpees: 3 sets of 10 reps",
+  "How can I improve my form?": "## Improving Exercise Form\n\n1. **Start with lighter weights** to master the movement pattern\n2. **Record yourself** performing exercises to identify issues\n3. **Focus on mind-muscle connection** rather than just moving weight\n4. **Work with a trainer** for personalized guidance\n5. **Practice proper breathing** techniques during exercises\n\nRemember that **proper form prevents injuries** and ensures you're targeting the right muscles!",
+  "Nutrition advice": "## Nutrition for Fitness\n\n### Key Principles\n- **Protein intake** - Aim for 0.8-1g per pound of bodyweight daily\n- **Hydration** - Drink at least 8 glasses of water daily\n- **Pre-workout** - Consume carbs and protein 1-2 hours before training\n- **Post-workout** - Refuel within 45 minutes with protein and carbs\n\n**Remember:** Nutrition is highly individual. These are general guidelines to start with!"
+};
+
 const Chatbot = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -34,6 +43,7 @@ const Chatbot = () => {
   // Updated API key
   const apiKey = "AIzaSyCfbKwlMAeS6lFFieCfP_XoWS0EITnMc7s";
   const [isLoading, setIsLoading] = useState(false);
+  const [apiError, setApiError] = useState(false);
   const { toast } = useToast();
   
   const handleSendMessage = async (text: string = inputValue) => {
@@ -63,8 +73,25 @@ const Chatbot = () => {
     setIsLoading(true);
     
     try {
+      // Check for fallback responses first for preset buttons
+      if (presetButtons.includes(text) && apiError) {
+        const fallbackResponse = fallbackResponses[text];
+        setTimeout(() => {
+          setMessages(prev => 
+            prev.map(msg => 
+              msg.id === loadingId 
+                ? { ...msg, text: fallbackResponse, structured: true } 
+                : msg
+            )
+          );
+          setIsLoading(false);
+        }, 1000);
+        return;
+      }
+      
       // Make API call to Google Gemini API
       const response = await fetchGeminiResponse(text, apiKey);
+      setApiError(false);
       
       // Replace loading message with actual response
       setMessages(prev => 
@@ -76,16 +103,30 @@ const Chatbot = () => {
       );
     } catch (error) {
       console.error("Error getting response:", error);
-      setMessages(prev => 
-        prev.map(msg => 
-          msg.id === loadingId 
-            ? { ...msg, text: "Sorry, I encountered an error communicating with Google Gemini AI. Please try again." } 
-            : msg
-        )
-      );
+      
+      // Use fallback response if available
+      if (presetButtons.includes(text) && fallbackResponses[text]) {
+        setMessages(prev => 
+          prev.map(msg => 
+            msg.id === loadingId 
+              ? { ...msg, text: fallbackResponses[text], structured: true } 
+              : msg
+          )
+        );
+      } else {
+        setMessages(prev => 
+          prev.map(msg => 
+            msg.id === loadingId 
+              ? { ...msg, text: "Sorry, I encountered an error communicating with Google Gemini AI. Please try again or use one of the preset questions." } 
+              : msg
+          )
+        );
+      }
+      
+      setApiError(true);
       toast({
-        title: "Error",
-        description: "Failed to get a response from Google Gemini API. Please try again later.",
+        title: "API Error",
+        description: "Using fallback responses until API is available again.",
         variant: "destructive"
       });
     } finally {
@@ -221,6 +262,14 @@ const Chatbot = () => {
       <h1 className="text-3xl font-bold mb-2">Virtual Fitness Coach</h1>
       <p className="text-gray-600 mb-6">Chat with your AI fitness assistant powered by Google Gemini</p>
       
+      {apiError && (
+        <Alert className="mb-4 bg-yellow-50 border-yellow-200">
+          <AlertDescription>
+            Gemini API is currently unavailable. Using fallback responses. Try again later or use the preset questions.
+          </AlertDescription>
+        </Alert>
+      )}
+      
       <Card className="border-0 shadow-md">
         <CardContent className="p-0">
           <div className="bg-[#3D9DA1] p-4 rounded-t-lg">
@@ -260,7 +309,7 @@ const Chatbot = () => {
             </div>
             
             {/* Preset buttons */}
-            {messages.length < 3 && (
+            {messages.length < 3 || apiError ? (
               <div className="p-4 border-t grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {presetButtons.map(text => (
                   <Button 
@@ -273,7 +322,7 @@ const Chatbot = () => {
                   </Button>
                 ))}
               </div>
-            )}
+            ) : null}
             
             {/* Input area */}
             <div className="p-4 border-t mt-auto">
