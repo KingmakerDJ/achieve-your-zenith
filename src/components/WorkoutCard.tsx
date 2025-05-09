@@ -26,21 +26,34 @@ const WorkoutCard = ({ title, category, duration, intensity, image, onClick }: W
     }
   };
 
-  // Function to get appropriate image based on category if the provided image isn't specific
-  const getAppropriateImage = (category: string, providedImage: string) => {
-    // Only use these fallbacks if the image looks like a generic placeholder
-    if (providedImage.includes("unsplash") && !providedImage.includes("workout")) {
-      switch(category.toLowerCase()) {
-        case 'chest': return "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
-        case 'back': return "https://images.unsplash.com/photo-1604047934811-8651171faebd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
-        case 'legs': return "https://images.unsplash.com/photo-1566241440091-ec10de8db2e1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
-        case 'shoulders': return "https://images.unsplash.com/photo-1530822847156-5df684ec5ee1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
-        case 'arms': return "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
-        case 'core': return "https://images.unsplash.com/photo-1607962837359-5e7e89f86776?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
-        default: return providedImage;
-      }
+  // Function to always use video thumbnails based on category
+  const getWorkoutImage = (category: string, title: string) => {
+    // Always use specific workout images based on category
+    switch(category.toLowerCase()) {
+      case 'chest': 
+        return "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+      case 'back': 
+        return "https://images.unsplash.com/photo-1604047934811-8651171faebd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+      case 'legs': 
+        return "https://images.unsplash.com/photo-1566241440091-ec10de8db2e1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+      case 'shoulders': 
+        return "https://images.unsplash.com/photo-1530822847156-5df684ec5ee1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+      case 'arms': 
+        return "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+      case 'core': 
+        return "https://images.unsplash.com/photo-1607962837359-5e7e89f86776?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+      default: 
+        // Default image based on workout title
+        if (title.toLowerCase().includes('bench') || title.toLowerCase().includes('press')) {
+          return "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+        } else if (title.toLowerCase().includes('squat') || title.toLowerCase().includes('leg')) {
+          return "https://images.unsplash.com/photo-1566241440091-ec10de8db2e1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+        } else if (title.toLowerCase().includes('pull') || title.toLowerCase().includes('dead')) {
+          return "https://images.unsplash.com/photo-1604047934811-8651171faebd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+        } else {
+          return "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+        }
     }
-    return providedImage;
   };
 
   return (
@@ -49,7 +62,7 @@ const WorkoutCard = ({ title, category, duration, intensity, image, onClick }: W
       onClick={onClick}
     >
       <img 
-        src={getAppropriateImage(category, image)} 
+        src={getWorkoutImage(category, title)} 
         alt={title} 
         className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
       />

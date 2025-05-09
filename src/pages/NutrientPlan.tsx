@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -52,7 +53,7 @@ const NutrientPlan = () => {
     }), { protein: 0, carbs: 0, fat: 0 });
   };
 
-  // New function to get complete nutrient items from recommendations
+  // Function to get complete nutrient items from recommendations
   const getCompleteNutrientItems = (recommendations: { id: string }[]) => {
     const completeItems: NutrientItem[] = [];
     
@@ -71,7 +72,7 @@ const NutrientPlan = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div className="flex items-center">
           <Apple className="h-7 w-7 mr-2 text-[#3D9DA1]" />
-          <h1 className="text-3xl font-bold">Nutrient Plan</h1>
+          <h1 className="text-3xl font-bold">Indian Nutrition Plan</h1>
         </div>
       </div>
 
@@ -206,154 +207,158 @@ const NutrientPlan = () => {
 
       {/* Nutrient Detail Dialog */}
       <Dialog open={!!selectedNutrient} onOpenChange={(open) => !open && setSelectedNutrient(null)}>
-        {selectedNutrient && (
-          <>
-            <DialogHeader>
-              <DialogTitle>{selectedNutrient.name}</DialogTitle>
-              <DialogDescription>
-                {selectedNutrient.category} • {selectedNutrient.servingSize}
-              </DialogDescription>
-            </DialogHeader>
-            
-            <div className="grid grid-cols-2 gap-4 py-4">
-              <div>
-                <p className="text-sm text-gray-500">Calories</p>
-                <p className="font-medium">{selectedNutrient.calories} kcal</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Protein</p>
-                <p className="font-medium">{selectedNutrient.protein}g</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Carbs</p>
-                <p className="font-medium">{selectedNutrient.carbs}g</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Fat</p>
-                <p className="font-medium">{selectedNutrient.fat}g</p>
-              </div>
-              {selectedNutrient.fiber > 0 && (
+        <DialogContent>
+          {selectedNutrient && (
+            <>
+              <DialogHeader>
+                <DialogTitle>{selectedNutrient.name}</DialogTitle>
+                <DialogDescription>
+                  {selectedNutrient.category} • {selectedNutrient.servingSize}
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="grid grid-cols-2 gap-4 py-4">
                 <div>
-                  <p className="text-sm text-gray-500">Fiber</p>
-                  <p className="font-medium">{selectedNutrient.fiber}g</p>
+                  <p className="text-sm text-gray-500">Calories</p>
+                  <p className="font-medium">{selectedNutrient.calories} kcal</p>
                 </div>
-              )}
-            </div>
-            
-            <div className="space-y-2 mb-4">
-              <p className="text-sm text-gray-500">Benefits:</p>
-              <div className="flex flex-wrap gap-1">
-                {selectedNutrient.benefits.map((benefit, index) => (
-                  <Badge key={index} variant="outline">
-                    {benefit}
-                  </Badge>
-                ))}
+                <div>
+                  <p className="text-sm text-gray-500">Protein</p>
+                  <p className="font-medium">{selectedNutrient.protein}g</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Carbs</p>
+                  <p className="font-medium">{selectedNutrient.carbs}g</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Fat</p>
+                  <p className="font-medium">{selectedNutrient.fat}g</p>
+                </div>
+                {selectedNutrient.fiber > 0 && (
+                  <div>
+                    <p className="text-sm text-gray-500">Fiber</p>
+                    <p className="font-medium">{selectedNutrient.fiber}g</p>
+                  </div>
+                )}
               </div>
-            </div>
-            
-            <Button 
-              className="w-full" 
-              onClick={() => handleAddToCustomPlan(selectedNutrient)}
-            >
-              Add to My Plan
-            </Button>
-          </>
-        )}
-      </Dialog>
-
-      {/* Plan Detail Dialog */}
-      <Dialog open={!!selectedPlan} onOpenChange={(open) => !open && setSelectedPlan(null)}>
-        {selectedPlan && (
-          <>
-            <DialogHeader>
-              <DialogTitle>{selectedPlan.title}</DialogTitle>
-              <DialogDescription>
-                {selectedPlan.description}
-              </DialogDescription>
-            </DialogHeader>
-            
-            <div className="space-y-4">
-              <div>
-                <h3 className="text-sm font-medium mb-2">Recommended Foods</h3>
-                <div className="grid grid-cols-2 gap-3">
-                  {selectedPlan.recommendations.map((item) => (
-                    <div key={item.id} className="p-2 bg-gray-50 rounded flex items-center gap-2">
-                      <div className="w-10 h-10 rounded overflow-hidden">
-                        <img 
-                          src={item.image} 
-                          alt={item.name} 
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div>
-                        <p className="font-medium text-sm">{item.name}</p>
-                        <p className="text-xs text-gray-500">{item.calories} kcal</p>
-                      </div>
-                    </div>
+              
+              <div className="space-y-2 mb-4">
+                <p className="text-sm text-gray-500">Benefits:</p>
+                <div className="flex flex-wrap gap-1">
+                  {selectedNutrient.benefits.map((benefit, index) => (
+                    <Badge key={index} variant="outline">
+                      {benefit}
+                    </Badge>
                   ))}
                 </div>
               </div>
               
-              <div>
-                <h3 className="text-sm font-medium mb-2">Nutrition Information</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm">Daily Calories:</span>
-                    <span className="font-medium">{selectedPlan.dailyCalories} kcal</span>
+              <Button 
+                className="w-full" 
+                onClick={() => handleAddToCustomPlan(selectedNutrient)}
+              >
+                Add to My Plan
+              </Button>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Plan Detail Dialog */}
+      <Dialog open={!!selectedPlan} onOpenChange={(open) => !open && setSelectedPlan(null)}>
+        <DialogContent>
+          {selectedPlan && (
+            <>
+              <DialogHeader>
+                <DialogTitle>{selectedPlan.title}</DialogTitle>
+                <DialogDescription>
+                  {selectedPlan.description}
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-sm font-medium mb-2">Recommended Foods</h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    {selectedPlan.recommendations.map((item) => (
+                      <div key={item.id} className="p-2 bg-gray-50 rounded flex items-center gap-2">
+                        <div className="w-10 h-10 rounded overflow-hidden">
+                          <img 
+                            src={item.image} 
+                            alt={item.name} 
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">{item.name}</p>
+                          <p className="text-xs text-gray-500">{item.calories} kcal</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <div>
-                    <p className="text-sm mb-1">Macronutrient Split:</p>
-                    <div className="flex items-center gap-1 h-2">
-                      <div className="h-full bg-blue-500 rounded-l" style={{width: `${selectedPlan.macroSplit.protein}%`}}></div>
-                      <div className="h-full bg-green-500" style={{width: `${selectedPlan.macroSplit.carbs}%`}}></div>
-                      <div className="h-full bg-yellow-500 rounded-r" style={{width: `${selectedPlan.macroSplit.fat}%`}}></div>
+                </div>
+                
+                <div>
+                  <h3 className="text-sm font-medium mb-2">Nutrition Information</h3>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-sm">Daily Calories:</span>
+                      <span className="font-medium">{selectedPlan.dailyCalories} kcal</span>
                     </div>
-                    <div className="flex justify-between text-xs mt-1">
-                      <span>Protein {selectedPlan.macroSplit.protein}%</span>
-                      <span>Carbs {selectedPlan.macroSplit.carbs}%</span>
-                      <span>Fat {selectedPlan.macroSplit.fat}%</span>
+                    <div>
+                      <p className="text-sm mb-1">Macronutrient Split:</p>
+                      <div className="flex items-center gap-1 h-2">
+                        <div className="h-full bg-blue-500 rounded-l" style={{width: `${selectedPlan.macroSplit.protein}%`}}></div>
+                        <div className="h-full bg-green-500" style={{width: `${selectedPlan.macroSplit.carbs}%`}}></div>
+                        <div className="h-full bg-yellow-500 rounded-r" style={{width: `${selectedPlan.macroSplit.fat}%`}}></div>
+                      </div>
+                      <div className="flex justify-between text-xs mt-1">
+                        <span>Protein {selectedPlan.macroSplit.protein}%</span>
+                        <span>Carbs {selectedPlan.macroSplit.carbs}%</span>
+                        <span>Fat {selectedPlan.macroSplit.fat}%</span>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-            
-            <div className="flex justify-end gap-2 mt-4">
-              <Button 
-                variant="outline" 
-                onClick={() => setSelectedPlan(null)}
-              >
-                Close
-              </Button>
-              <Button onClick={() => {
-                // Get complete nutrient items for the recommendations
-                const completeItems = getCompleteNutrientItems(selectedPlan.recommendations);
-                
-                // Filter out items that are already in the custom plan
-                const newItems = completeItems.filter(
-                  item => !customPlan.some(existing => existing.id === item.id)
-                );
-                
-                if (newItems.length > 0) {
-                  setCustomPlan([...customPlan, ...newItems]);
-                  toast({
-                    title: "Plan added",
-                    description: `Added ${newItems.length} new items to your custom plan`,
-                  });
-                } else {
-                  toast({
-                    title: "No new items",
-                    description: "All items from this plan are already in your custom plan",
-                  });
-                }
-                
-                setSelectedPlan(null);
-              }}>
-                Use This Plan
-              </Button>
-            </div>
-          </>
-        )}
+              
+              <div className="flex justify-end gap-2 mt-4">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setSelectedPlan(null)}
+                >
+                  Close
+                </Button>
+                <Button onClick={() => {
+                  // Get complete nutrient items for the recommendations
+                  const completeItems = getCompleteNutrientItems(selectedPlan.recommendations);
+                  
+                  // Filter out items that are already in the custom plan
+                  const newItems = completeItems.filter(
+                    item => !customPlan.some(existing => existing.id === item.id)
+                  );
+                  
+                  if (newItems.length > 0) {
+                    setCustomPlan([...customPlan, ...newItems]);
+                    toast({
+                      title: "Plan added",
+                      description: `Added ${newItems.length} new items to your custom plan`,
+                    });
+                  } else {
+                    toast({
+                      title: "No new items",
+                      description: "All items from this plan are already in your custom plan",
+                    });
+                  }
+                  
+                  setSelectedPlan(null);
+                }}>
+                  Use This Plan
+                </Button>
+              </div>
+            </>
+          )}
+        </DialogContent>
       </Dialog>
     </div>
   );
