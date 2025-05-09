@@ -2,7 +2,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Play } from "lucide-react";
+import { Play, GenderMale, GenderFemale } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 export interface WorkoutVideoProps {
   id: string;
@@ -14,6 +15,7 @@ export interface WorkoutVideoProps {
   videoUrl: string;
   bodyPart?: string;
   caption?: string;
+  targetGender?: "male" | "female" | "all";
 }
 
 const WorkoutVideo = ({
@@ -24,37 +26,49 @@ const WorkoutVideo = ({
   thumbnailUrl,
   videoUrl,
   bodyPart,
-  caption
+  caption,
+  targetGender = "all"
 }: WorkoutVideoProps) => {
   const [showVideo, setShowVideo] = useState(false);
   
-  // Function to always use video thumbnails based on category and title
-  const getWorkoutImage = (category: string, title: string) => {
-    // Always use specific workout images based on category
+  // Function to get video thumbnail based on category and title
+  const getWorkoutVideoThumbnail = (category: string, title: string) => {
+    // Extract video ID from videoUrl
+    const getVideoId = (url: string) => {
+      const match = url.match(/embed\/([^\/\?]+)/);
+      return match ? match[1] : null;
+    };
+    
+    const videoId = getVideoId(videoUrl);
+    if (videoId) {
+      return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+    }
+    
+    // Fallbacks based on category if video ID extraction fails
     switch(category.toLowerCase()) {
       case 'chest': 
-        return "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+        return "https://img.youtube.com/vi/rT7DgCr-3pg/hqdefault.jpg";
       case 'back': 
-        return "https://images.unsplash.com/photo-1604047934811-8651171faebd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+        return "https://img.youtube.com/vi/r4MzxtBKyNE/hqdefault.jpg"; 
       case 'legs': 
-        return "https://images.unsplash.com/photo-1566241440091-ec10de8db2e1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+        return "https://img.youtube.com/vi/SW_C1A-rejs/hqdefault.jpg";
       case 'shoulders': 
-        return "https://images.unsplash.com/photo-1530822847156-5df684ec5ee1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+        return "https://img.youtube.com/vi/qEwKCR5JCog/hqdefault.jpg";
       case 'arms': 
-        return "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+        return "https://img.youtube.com/vi/ykJmrZ5v0Oo/hqdefault.jpg";
       case 'core': 
-        return "https://images.unsplash.com/photo-1607962837359-5e7e89f86776?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+        return "https://img.youtube.com/vi/ASdvN_XEl_c/hqdefault.jpg";
       default: 
-        // Default image based on workout title
-        if (title.toLowerCase().includes('bench') || title.toLowerCase().includes('press')) {
-          return "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
-        } else if (title.toLowerCase().includes('squat') || title.toLowerCase().includes('leg')) {
-          return "https://images.unsplash.com/photo-1566241440091-ec10de8db2e1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
-        } else if (title.toLowerCase().includes('pull') || title.toLowerCase().includes('dead')) {
-          return "https://images.unsplash.com/photo-1604047934811-8651171faebd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
-        } else {
-          return "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
-        }
+        return "https://img.youtube.com/vi/eGo4IYlbE5g/hqdefault.jpg";
+    }
+  };
+
+  // Get gender badge color
+  const getGenderBadgeColor = (gender: string) => {
+    switch(gender) {
+      case 'male': return 'bg-blue-100 text-blue-800';
+      case 'female': return 'bg-pink-100 text-pink-800';
+      default: return 'bg-green-100 text-green-800';
     }
   };
 
@@ -74,7 +88,7 @@ const WorkoutVideo = ({
         ) : (
           <div className="aspect-video relative overflow-hidden">
             <img
-              src={getWorkoutImage(category, title)}
+              src={getWorkoutVideoThumbnail(category, title)}
               alt={title}
               className="w-full h-full object-cover"
             />
@@ -109,6 +123,15 @@ const WorkoutVideo = ({
           }`}>
             {intensity}
           </span>
+          
+          {targetGender !== "all" && (
+            <span className={`text-xs py-1 px-2 rounded-full flex items-center ${getGenderBadgeColor(targetGender)}`}>
+              {targetGender === "male" ? 
+                <><GenderMale className="w-3 h-3 mr-1" /> Male</> : 
+                <><GenderFemale className="w-3 h-3 mr-1" /> Female</>
+              }
+            </span>
+          )}
         </div>
         {caption && (
           <p className="text-sm text-gray-600">{caption}</p>

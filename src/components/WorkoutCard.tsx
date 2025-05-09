@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Clock, Dumbbell, Heart } from "lucide-react";
+import { Clock, Dumbbell, Heart, GenderFemale, GenderMale } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface WorkoutCardProps {
@@ -10,9 +10,10 @@ interface WorkoutCardProps {
   intensity: "Easy" | "Medium" | "Hard";
   image: string;
   onClick?: () => void;
+  targetGender?: "male" | "female" | "all";
 }
 
-const WorkoutCard = ({ title, category, duration, intensity, image, onClick }: WorkoutCardProps) => {
+const WorkoutCard = ({ title, category, duration, intensity, image, onClick, targetGender = "all" }: WorkoutCardProps) => {
   // Function to get category color
   const getCategoryColor = (category: string) => {
     switch(category.toLowerCase()) {
@@ -26,33 +27,44 @@ const WorkoutCard = ({ title, category, duration, intensity, image, onClick }: W
     }
   };
 
-  // Function to always use video thumbnails based on category
-  const getWorkoutImage = (category: string, title: string) => {
-    // Always use specific workout images based on category
+  // Function to get video thumbnail based on category and title
+  const getWorkoutVideoThumbnail = (category: string, title: string) => {
+    // Always use specific workout video thumbnails based on category
     switch(category.toLowerCase()) {
       case 'chest': 
-        return "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+        return "https://img.youtube.com/vi/rT7DgCr-3pg/hqdefault.jpg";
       case 'back': 
-        return "https://images.unsplash.com/photo-1604047934811-8651171faebd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+        return "https://img.youtube.com/vi/r4MzxtBKyNE/hqdefault.jpg"; 
       case 'legs': 
-        return "https://images.unsplash.com/photo-1566241440091-ec10de8db2e1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+        return "https://img.youtube.com/vi/SW_C1A-rejs/hqdefault.jpg";
       case 'shoulders': 
-        return "https://images.unsplash.com/photo-1530822847156-5df684ec5ee1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+        return "https://img.youtube.com/vi/qEwKCR5JCog/hqdefault.jpg";
       case 'arms': 
-        return "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+        return "https://img.youtube.com/vi/ykJmrZ5v0Oo/hqdefault.jpg";
       case 'core': 
-        return "https://images.unsplash.com/photo-1607962837359-5e7e89f86776?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+        return "https://img.youtube.com/vi/ASdvN_XEl_c/hqdefault.jpg";
       default: 
-        // Default image based on workout title
+        // Default video thumbnail based on workout title
         if (title.toLowerCase().includes('bench') || title.toLowerCase().includes('press')) {
-          return "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+          return "https://img.youtube.com/vi/rT7DgCr-3pg/hqdefault.jpg";
         } else if (title.toLowerCase().includes('squat') || title.toLowerCase().includes('leg')) {
-          return "https://images.unsplash.com/photo-1566241440091-ec10de8db2e1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+          return "https://img.youtube.com/vi/SW_C1A-rejs/hqdefault.jpg";
         } else if (title.toLowerCase().includes('pull') || title.toLowerCase().includes('dead')) {
-          return "https://images.unsplash.com/photo-1604047934811-8651171faebd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+          return "https://img.youtube.com/vi/r4MzxtBKyNE/hqdefault.jpg";
+        } else if (title.toLowerCase().includes('hip') || title.toLowerCase().includes('thrust')) {
+          return "https://img.youtube.com/vi/xDmFkJxPzeM/hqdefault.jpg";
         } else {
-          return "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+          return "https://img.youtube.com/vi/eGo4IYlbE5g/hqdefault.jpg";
         }
+    }
+  };
+
+  // Get gender badge color
+  const getGenderBadgeColor = (gender: string) => {
+    switch(gender) {
+      case 'male': return 'bg-blue-500/20 text-blue-300';
+      case 'female': return 'bg-pink-500/20 text-pink-300';
+      default: return 'bg-green-500/20 text-green-300';
     }
   };
 
@@ -62,7 +74,7 @@ const WorkoutCard = ({ title, category, duration, intensity, image, onClick }: W
       onClick={onClick}
     >
       <img 
-        src={getWorkoutImage(category, title)} 
+        src={getWorkoutVideoThumbnail(category, title)} 
         alt={title} 
         className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
       />
@@ -71,6 +83,16 @@ const WorkoutCard = ({ title, category, duration, intensity, image, onClick }: W
           {category}
         </Badge>
       </div>
+
+      {targetGender !== "all" && (
+        <div className="absolute top-2 right-2">
+          <Badge className={`${getGenderBadgeColor(targetGender)}`}>
+            {targetGender === "male" ? <GenderMale className="h-3 w-3 mr-1" /> : <GenderFemale className="h-3 w-3 mr-1" />}
+            {targetGender.charAt(0).toUpperCase() + targetGender.slice(1)}
+          </Badge>
+        </div>
+      )}
+
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex flex-col justify-end p-4">
         <div className="mb-2 flex items-center gap-2">
           <span className="bg-white/20 text-white py-1 px-2 rounded-md text-xs flex items-center">
