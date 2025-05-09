@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Play, GenderMale, GenderFemale } from "lucide-react";
+import { Play, Male, Female } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 export interface WorkoutVideoProps {
@@ -127,8 +127,8 @@ const WorkoutVideo = ({
           {targetGender !== "all" && (
             <span className={`text-xs py-1 px-2 rounded-full flex items-center ${getGenderBadgeColor(targetGender)}`}>
               {targetGender === "male" ? 
-                <><GenderMale className="w-3 h-3 mr-1" /> Male</> : 
-                <><GenderFemale className="w-3 h-3 mr-1" /> Female</>
+                <><Male className="w-3 h-3 mr-1" /> Male</> : 
+                <><Female className="w-3 h-3 mr-1" /> Female</>
               }
             </span>
           )}
