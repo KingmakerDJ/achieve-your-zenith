@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Clock, Dumbbell, Heart, User } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
-interface WorkoutCardProps {
+export interface WorkoutCardProps {
   title: string;
   category: string;
   duration: string;
