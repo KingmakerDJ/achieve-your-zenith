@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Play, User } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export interface WorkoutVideoProps {
   id: string;
@@ -30,6 +31,7 @@ const WorkoutVideo = ({
   targetGender = "all"
 }: WorkoutVideoProps) => {
   const [showVideo, setShowVideo] = useState(false);
+  const isMobile = useIsMobile();
   
   // Function to get video thumbnail based on category and title
   const getWorkoutVideoThumbnail = (category: string, title: string) => {
@@ -96,9 +98,9 @@ const WorkoutVideo = ({
               <Button 
                 onClick={() => setShowVideo(true)} 
                 size="icon" 
-                className="rounded-full h-14 w-14 bg-fitness-primary hover:bg-fitness-primary/90"
+                className="rounded-full h-10 w-10 sm:h-14 sm:w-14 bg-fitness-primary hover:bg-fitness-primary/90"
               >
-                <Play className="h-6 w-6" />
+                <Play className="h-4 w-4 sm:h-6 sm:w-6" />
               </Button>
             </div>
           </div>
@@ -107,14 +109,14 @@ const WorkoutVideo = ({
           {duration}
         </div>
       </div>
-      <CardContent className="pt-4 flex-grow">
-        <h3 className="font-semibold text-lg mb-1">{title}</h3>
-        <div className="flex items-center gap-2 mb-2 flex-wrap">
-          <span className="bg-slate-100 py-1 px-2 rounded-md text-xs">{category}</span>
+      <CardContent className="pt-3 sm:pt-4 flex-grow">
+        <h3 className="font-semibold text-base sm:text-lg mb-1 line-clamp-1">{title}</h3>
+        <div className="flex items-center gap-1 sm:gap-2 mb-2 flex-wrap">
+          <span className="bg-slate-100 py-1 px-1 sm:px-2 rounded-md text-xs">{category}</span>
           {bodyPart && bodyPart !== category && (
-            <span className="bg-slate-100 py-1 px-2 rounded-md text-xs">{bodyPart}</span>
+            <span className="bg-slate-100 py-1 px-1 sm:px-2 rounded-md text-xs">{bodyPart}</span>
           )}
-          <span className={`text-xs py-1 px-2 rounded-full ${
+          <span className={`text-xs py-1 px-1 sm:px-2 rounded-full ${
             intensity === "Easy" 
               ? "bg-green-100 text-green-800" 
               : intensity === "Medium" 
@@ -125,14 +127,14 @@ const WorkoutVideo = ({
           </span>
           
           {targetGender !== "all" && (
-            <span className={`text-xs py-1 px-2 rounded-full flex items-center ${getGenderBadgeColor(targetGender)}`}>
-              <User className="w-3 h-3 mr-1" />
+            <span className={`text-xs py-1 px-1 sm:px-2 rounded-full flex items-center ${getGenderBadgeColor(targetGender)}`}>
+              <User className="w-2 h-2 sm:w-3 sm:h-3 mr-1" />
               {targetGender === "male" ? "Male" : "Female"}
             </span>
           )}
         </div>
         {caption && (
-          <p className="text-sm text-gray-600">{caption}</p>
+          <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">{caption}</p>
         )}
       </CardContent>
     </Card>

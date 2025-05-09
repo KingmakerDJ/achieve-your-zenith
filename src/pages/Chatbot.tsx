@@ -7,6 +7,7 @@ import { MessageSquare, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Textarea } from "@/components/ui/textarea";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Message {
   id: number;
@@ -51,6 +52,7 @@ const Chatbot = () => {
   const [apiError, setApiError] = useState(false); // Set to false to attempt API call first
   const { toast } = useToast();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
   
   // Auto-scroll to bottom of messages
   useEffect(() => {
@@ -290,8 +292,8 @@ const Chatbot = () => {
   };
 
   return (
-    <div className="container py-6 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-2">Virtual Fitness Coach</h1>
+    <div className="container py-6 max-w-4xl mx-auto px-4">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-2">Virtual Fitness Coach</h1>
       <p className="text-gray-600 mb-6">Chat with your AI fitness assistant powered by Google Gemini</p>
       
       {apiError && (
@@ -304,25 +306,25 @@ const Chatbot = () => {
       
       <Card className="border-0 shadow-md">
         <CardContent className="p-0">
-          <div className="bg-[#3D9DA1] p-4 rounded-t-lg">
+          <div className="bg-[#3D9DA1] p-3 sm:p-4 rounded-t-lg">
             <div className="flex items-center justify-between">
               <div className="flex items-center text-white">
-                <MessageSquare className="h-6 w-6 mr-2" />
-                <h2 className="text-xl font-semibold">Fitness Coach</h2>
+                <MessageSquare className="h-5 w-5 sm:h-6 sm:w-6 mr-2" />
+                <h2 className="text-lg sm:text-xl font-semibold">Fitness Coach</h2>
               </div>
             </div>
           </div>
           
-          <div className="flex flex-col h-[70vh]">
+          <div className="flex flex-col h-[65vh] sm:h-[70vh]">
             {/* Chat messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
               {messages.map(message => (
                 <div 
                   key={message.id}
                   className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
                 >
                   <div 
-                    className={`max-w-[80%] rounded-lg p-3 ${
+                    className={`max-w-[85%] sm:max-w-[80%] rounded-lg p-2 sm:p-3 ${
                       message.isUser 
                         ? 'bg-[#3D9DA1] text-white' 
                         : 'bg-gray-100 text-gray-800'
@@ -330,7 +332,7 @@ const Chatbot = () => {
                   >
                     {message.structured && !message.isUser ? 
                       renderStructuredContent(message.text) : 
-                      <p>{message.text}</p>
+                      <p className="text-sm sm:text-base">{message.text}</p>
                     }
                     <p className="text-xs mt-1 opacity-70">
                       {message.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
@@ -342,15 +344,15 @@ const Chatbot = () => {
             </div>
             
             {/* Preset buttons - made scrollable on small screens */}
-            <div className="p-4 border-t overflow-x-auto">
-              <div className="flex flex-wrap gap-2">
+            <div className="p-2 sm:p-4 border-t overflow-x-auto">
+              <div className="flex gap-2 pb-2 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300">
                 {presetButtons.map(text => (
                   <Button 
                     key={text} 
                     variant="outline" 
                     onClick={() => handleSendMessage(text)}
                     disabled={isLoading}
-                    className="whitespace-nowrap text-left justify-start h-auto py-3 border-gray-200 hover:bg-gray-50 hover:text-[#3D9DA1] text-sm md:text-base"
+                    className="whitespace-nowrap text-left justify-start h-auto py-2 border-gray-200 hover:bg-gray-50 hover:text-[#3D9DA1] text-xs sm:text-sm flex-shrink-0"
                   >
                     {text}
                   </Button>
@@ -359,7 +361,7 @@ const Chatbot = () => {
             </div>
             
             {/* Input area - made more visible and responsive */}
-            <div className="p-4 border-t mt-auto bg-gray-50">
+            <div className="p-3 sm:p-4 border-t mt-auto bg-gray-50">
               <form 
                 className="flex gap-2" 
                 onSubmit={(e) => {
@@ -371,7 +373,7 @@ const Chatbot = () => {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder="Type your message..."
-                  className="flex-1 min-h-[50px] max-h-[120px] resize-none"
+                  className="flex-1 min-h-[40px] sm:min-h-[50px] max-h-[100px] sm:max-h-[120px] resize-none text-sm sm:text-base"
                   disabled={isLoading}
                   rows={1}
                   onKeyDown={(e) => {
@@ -383,7 +385,7 @@ const Chatbot = () => {
                 />
                 <Button 
                   type="submit"
-                  className="bg-[#3D9DA1] hover:bg-[#3D9DA1]/90 h-auto px-4"
+                  className="bg-[#3D9DA1] hover:bg-[#3D9DA1]/90 h-auto px-3 sm:px-4 self-end"
                   disabled={!inputValue.trim() || isLoading}
                 >
                   <Send className="h-4 w-4" />

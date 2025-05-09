@@ -11,6 +11,7 @@ import { Grid3x3, List, Play, User, Camera } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import FormScanner from "@/components/FormScanner";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Workouts = () => {
   const [activeBodyPart, setActiveBodyPart] = useState("all");
@@ -19,9 +20,12 @@ const Workouts = () => {
   const [selectedWorkout, setSelectedWorkout] = useState<any | null>(null);
   const [showVideoId, setShowVideoId] = useState<string | null>(null);
   const [showFormScanner, setShowFormScanner] = useState(false);
+  const isMobile = useIsMobile();
   
   // Get filtered workout videos based on selected body part and gender
   const workoutVideos = getWorkoutVideos(activeBodyPart, activeGender !== "all" ? activeGender : undefined);
+  
+  // Get recommended workouts filtered by gender
   const recommendedWorkouts = getRecommendedWorkouts(activeGender !== "all" ? activeGender : undefined);
 
   const handleBodyPartChange = (value: string) => {
@@ -48,26 +52,37 @@ const Workouts = () => {
     
     return categoriesToShow.map(category => {
       // Get the first two videos of each category for cards, filtered by gender
-      const videos = getWorkoutVideos(category, activeGender !== "all" ? activeGender : undefined).slice(0, 2);
+      const videos = getWorkoutVideos(category, activeGender !== "all" ? activeGender : undefined).slice(0, isMobile ? 1 : 2);
       
       if (videos.length === 0) return null;
       
       return (
         <div key={category} className="mb-8">
           <h2 className="text-xl font-bold mb-4 capitalize">{category}</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {videos.map((video) => (
               <WorkoutCard
                 key={video.id}
                 title={video.title}
                 category={video.category}
                 duration={video.duration}
-                intensity={video.intensity}
+                intensity={video.intensity as "Easy" | "Medium" | "Hard"}
                 image={video.thumbnailUrl}
-                targetGender={video.targetGender}
+                targetGender={video.targetGender as "male" | "female" | "all"}
                 onClick={() => handleShowVideo(video.id)}
               />
             ))}
+            <Button 
+              variant="outline" 
+              className="h-16 sm:h-24 border-dashed"
+              onClick={() => {
+                setActiveBodyPart(category);
+                const element = document.getElementById('all-workouts');
+                element?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              View all {category} workouts
+            </Button>
           </div>
         </div>
       );
@@ -75,14 +90,14 @@ const Workouts = () => {
   };
 
   return (
-    <div className="container py-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <h1 className="text-3xl font-bold">Workout Video Library</h1>
-        <div className="flex gap-2">
+    <div className="container py-4 sm:py-6 px-4 sm:px-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-3 sm:gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold">Workout Video Library</h1>
+        <div className="flex gap-2 flex-wrap w-full sm:w-auto justify-end">
           <Button 
             variant="outline" 
             size="icon"
-            className={viewMode === "grid" ? "bg-slate-100" : ""}
+            className={`${viewMode === "grid" ? "bg-slate-100" : ""} hidden sm:flex`}
             onClick={() => setViewMode("grid")}
           >
             <Grid3x3 className="h-4 w-4" />
@@ -90,22 +105,22 @@ const Workouts = () => {
           <Button 
             variant="outline"
             size="icon"
-            className={viewMode === "list" ? "bg-slate-100" : ""}
+            className={`${viewMode === "list" ? "bg-slate-100" : ""} hidden sm:flex`}
             onClick={() => setViewMode("list")}
           >
             <List className="h-4 w-4" />
           </Button>
           <Button 
             variant="outline"
-            className="gap-2"
+            className="gap-2 text-sm"
             onClick={() => setShowFormScanner(true)}
           >
             <Camera className="h-4 w-4" />
-            Check Form
+            <span className="sm:block">Check Form</span>
           </Button>
           <Dialog>
             <DialogTrigger asChild>
-              <Button className="bg-fitness-primary hover:bg-fitness-primary/90">
+              <Button className="bg-fitness-primary hover:bg-fitness-primary/90 text-sm">
                 Create Custom Workout
               </Button>
             </DialogTrigger>
@@ -120,9 +135,9 @@ const Workouts = () => {
                 {/* Custom workout builder would go here */}
                 <p>Coming soon! This feature is under development.</p>
               </div>
-              <DialogFooter>
-                <Button type="button" variant="outline">Cancel</Button>
-                <Button type="button">Save Workout</Button>
+              <DialogFooter className="flex-col sm:flex-row gap-2">
+                <Button type="button" variant="outline" className="w-full sm:w-auto">Cancel</Button>
+                <Button type="button" className="w-full sm:w-auto">Save Workout</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -130,15 +145,15 @@ const Workouts = () => {
       </div>
       
       {/* First-level filter: Gender filter */}
-      <div className="mb-6">
-        <h2 className="text-lg font-medium mb-2">Target Gender</h2>
+      <div className="mb-4 sm:mb-6 bg-white p-3 rounded-lg shadow-sm">
+        <h2 className="text-base sm:text-lg font-medium mb-2">Target Gender</h2>
         <Tabs 
           defaultValue="all" 
           value={activeGender}
           onValueChange={(value) => handleGenderChange(value as "all" | "male" | "female")}
           className="w-full"
         >
-          <TabsList className="mb-2">
+          <TabsList className="mb-2 w-full sm:w-auto grid grid-cols-3 sm:flex">
             <TabsTrigger value="all">All Genders</TabsTrigger>
             <TabsTrigger value="male">Men</TabsTrigger>
             <TabsTrigger value="female">Women</TabsTrigger>
@@ -147,18 +162,18 @@ const Workouts = () => {
       </div>
       
       {/* Featured workouts section */}
-      <section className="mb-10">
-        <h2 className="text-2xl font-bold mb-4">Featured Workouts</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {recommendedWorkouts.slice(0, 3).map((workout) => (
+      <section className="mb-8 sm:mb-10">
+        <h2 className="text-xl sm:text-2xl font-bold mb-4">Featured Workouts</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          {recommendedWorkouts.slice(0, isMobile ? 2 : 3).map((workout) => (
             <WorkoutCard
               key={workout.id}
               title={workout.title}
               category={workout.category}
               duration={workout.duration}
-              intensity={workout.intensity}
+              intensity={workout.intensity as "Easy" | "Medium" | "Hard"}
               image={workout.image}
-              targetGender={workout.targetGender}
+              targetGender={workout.targetGender as "male" | "female" | "all"}
               onClick={() => handleWorkoutSelect(workout)}
             />
           ))}
@@ -166,106 +181,113 @@ const Workouts = () => {
       </section>
       
       {/* Display workout cards grouped by category */}
-      <section className="mb-10">
-        <h2 className="text-2xl font-bold mb-4">Browse By Body Part</h2>
+      <section className="mb-8 sm:mb-10">
+        <h2 className="text-xl sm:text-2xl font-bold mb-4">Browse By Body Part</h2>
         {renderWorkoutCards()}
       </section>
       
       {/* Second-level filter: Body part tabs */}
-      <Tabs defaultValue="all" className="w-full" onValueChange={handleBodyPartChange} value={activeBodyPart}>
-        <h2 className="text-2xl font-bold mb-4">All Workout Videos</h2>
-        <TabsList className="mb-6">
-          <TabsTrigger value="all">All Workouts</TabsTrigger>
-          <TabsTrigger value="chest">Chest</TabsTrigger>
-          <TabsTrigger value="back">Back</TabsTrigger>
-          <TabsTrigger value="legs">Legs</TabsTrigger>
-          <TabsTrigger value="shoulders">Shoulders</TabsTrigger>
-          <TabsTrigger value="arms">Arms</TabsTrigger>
-          <TabsTrigger value="core">Core</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value={activeBodyPart} className="mt-0">
-          <div className={viewMode === "grid" 
-            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-            : "space-y-4"
-          }>
-            {workoutVideos.map((workout) => (
-              viewMode === "grid" ? (
-                <WorkoutVideo
-                  key={workout.id}
-                  {...workout}
-                />
-              ) : (
-                <Card key={workout.id} className="overflow-hidden">
-                  <CardContent className="p-0">
-                    <div className="flex flex-col md:flex-row">
-                      <div className="relative md:w-1/3">
-                        <div 
-                          className="aspect-video md:aspect-square relative cursor-pointer"
-                          onClick={() => handleShowVideo(workout.id)}
-                        >
-                          <img
-                            src={workout.thumbnailUrl}
-                            alt={workout.title}
-                            className="w-full h-full object-cover"
-                          />
-                          <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+      <div id="all-workouts">
+        <Tabs defaultValue="all" className="w-full" onValueChange={handleBodyPartChange} value={activeBodyPart}>
+          <h2 className="text-xl sm:text-2xl font-bold mb-4">All Workout Videos</h2>
+          <TabsList className="mb-6 w-full overflow-x-auto flex flex-nowrap pb-2">
+            <TabsTrigger value="all">All Workouts</TabsTrigger>
+            <TabsTrigger value="chest">Chest</TabsTrigger>
+            <TabsTrigger value="back">Back</TabsTrigger>
+            <TabsTrigger value="legs">Legs</TabsTrigger>
+            <TabsTrigger value="shoulders">Shoulders</TabsTrigger>
+            <TabsTrigger value="arms">Arms</TabsTrigger>
+            <TabsTrigger value="core">Core</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value={activeBodyPart} className="mt-0">
+            <div className={viewMode === "grid" 
+              ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
+              : "space-y-4"
+            }>
+              {workoutVideos.map((workout) => (
+                viewMode === "grid" ? (
+                  <WorkoutVideo
+                    key={workout.id}
+                    {...workout}
+                  />
+                ) : (
+                  <Card key={workout.id} className="overflow-hidden">
+                    <CardContent className="p-0">
+                      <div className="flex flex-col md:flex-row">
+                        <div className="relative md:w-1/3">
+                          <div 
+                            className="aspect-video md:aspect-square relative cursor-pointer"
+                            onClick={() => handleShowVideo(workout.id)}
+                          >
+                            <img
+                              src={workout.thumbnailUrl}
+                              alt={workout.title}
+                              className="w-full h-full object-cover"
+                            />
+                            <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+                              <Button 
+                                size="icon" 
+                                className="rounded-full h-10 w-10 bg-fitness-primary hover:bg-fitness-primary/90"
+                              >
+                                <Play className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="p-4 md:w-2/3">
+                          <div className="flex justify-between">
+                            <h3 className="font-semibold text-lg">{workout.title}</h3>
+                            <span className="text-xs bg-slate-100 py-1 px-2 rounded">{workout.duration}</span>
+                          </div>
+                          <div className="flex items-center gap-2 my-2 flex-wrap">
+                            <span className="bg-slate-100 py-1 px-2 rounded-md text-xs">{workout.category}</span>
+                            {workout.bodyPart && workout.bodyPart !== workout.category && (
+                              <span className="bg-slate-100 py-1 px-2 rounded-md text-xs">{workout.bodyPart}</span>
+                            )}
+                            <span className={`text-xs py-1 px-2 rounded-full ${
+                              workout.intensity === "Easy" 
+                                ? "bg-green-100 text-green-800" 
+                                : workout.intensity === "Medium" 
+                                ? "bg-yellow-100 text-yellow-800" 
+                                : "bg-red-100 text-red-800"
+                            }`}>
+                              {workout.intensity}
+                            </span>
+                            {workout.targetGender !== "all" && (
+                              <span className="bg-slate-100 py-1 px-2 rounded-md text-xs flex items-center">
+                                <User className="mr-1 h-3 w-3" />
+                                {workout.targetGender === "male" ? "Men" : "Women"}
+                              </span>
+                            )}
+                          </div>
+                          {workout.caption && (
+                            <p className="text-sm text-gray-600 line-clamp-2">{workout.caption}</p>
+                          )}
+                          <div className="mt-3">
                             <Button 
-                              size="icon" 
-                              className="rounded-full h-10 w-10 bg-fitness-primary hover:bg-fitness-primary/90"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleShowVideo(workout.id)}
                             >
-                              <Play className="h-4 w-4" />
+                              Watch Video
                             </Button>
                           </div>
                         </div>
                       </div>
-                      <div className="p-4 md:w-2/3">
-                        <div className="flex justify-between">
-                          <h3 className="font-semibold text-lg">{workout.title}</h3>
-                          <span className="text-xs bg-slate-100 py-1 px-2 rounded">{workout.duration}</span>
-                        </div>
-                        <div className="flex items-center gap-2 my-2 flex-wrap">
-                          <span className="bg-slate-100 py-1 px-2 rounded-md text-xs">{workout.category}</span>
-                          {workout.bodyPart && workout.bodyPart !== workout.category && (
-                            <span className="bg-slate-100 py-1 px-2 rounded-md text-xs">{workout.bodyPart}</span>
-                          )}
-                          <span className={`text-xs py-1 px-2 rounded-full ${
-                            workout.intensity === "Easy" 
-                              ? "bg-green-100 text-green-800" 
-                              : workout.intensity === "Medium" 
-                              ? "bg-yellow-100 text-yellow-800" 
-                              : "bg-red-100 text-red-800"
-                          }`}>
-                            {workout.intensity}
-                          </span>
-                          {workout.targetGender !== "all" && (
-                            <span className="bg-slate-100 py-1 px-2 rounded-md text-xs flex items-center">
-                              <User className="mr-1 h-3 w-3" />
-                              {workout.targetGender === "male" ? "Men" : "Women"}
-                            </span>
-                          )}
-                        </div>
-                        {workout.caption && (
-                          <p className="text-sm text-gray-600 line-clamp-2">{workout.caption}</p>
-                        )}
-                        <div className="mt-3">
-                          <Button 
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleShowVideo(workout.id)}
-                          >
-                            Watch Video
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              )
-            ))}
-          </div>
-        </TabsContent>
-      </Tabs>
+                    </CardContent>
+                  </Card>
+                )
+              ))}
+              {workoutVideos.length === 0 && (
+                <div className="col-span-full text-center py-8">
+                  <p className="text-gray-500">No workouts found for the selected filters.</p>
+                </div>
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
       
       {/* Video Dialog */}
       <Dialog open={!!showVideoId} onOpenChange={(open) => !open && setShowVideoId(null)}>
