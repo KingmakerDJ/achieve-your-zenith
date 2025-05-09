@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -7,16 +6,21 @@ import WorkoutCard from "@/components/WorkoutCard";
 import { getWorkoutVideos, getRecommendedWorkouts, getWorkoutVideoById } from "@/data/workoutData";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
-import { Grid3x3, List, Play } from "lucide-react";
+import { Grid3x3, List, Play, User, Camera } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import FormScanner from "@/components/FormScanner";
 
 const Workouts = () => {
   const [activeTab, setActiveTab] = useState("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedWorkout, setSelectedWorkout] = useState<any | null>(null);
   const [showVideoId, setShowVideoId] = useState<string | null>(null);
+  const [genderFilter, setGenderFilter] = useState<"all" | "male" | "female">("all");
+  const [showFormScanner, setShowFormScanner] = useState(false);
   
-  const workoutVideos = getWorkoutVideos(activeTab);
-  const recommendedWorkouts = getRecommendedWorkouts();
+  const workoutVideos = getWorkoutVideos(activeTab, genderFilter !== "all" ? genderFilter : undefined);
+  const recommendedWorkouts = getRecommendedWorkouts(genderFilter !== "all" ? genderFilter : undefined);
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
@@ -30,6 +34,10 @@ const Workouts = () => {
     setShowVideoId(videoId);
     // Close workout detail if open
     setSelectedWorkout(null);
+  };
+
+  const handleGenderFilterChange = (value: "all" | "male" | "female") => {
+    setGenderFilter(value);
   };
 
   // Create workout cards for each category
@@ -84,6 +92,14 @@ const Workouts = () => {
           >
             <List className="h-4 w-4" />
           </Button>
+          <Button 
+            variant="outline"
+            className="gap-2"
+            onClick={() => setShowFormScanner(true)}
+          >
+            <Camera className="h-4 w-4" />
+            Check Form
+          </Button>
           <Dialog>
             <DialogTrigger asChild>
               <Button className="bg-fitness-primary hover:bg-fitness-primary/90">
@@ -108,6 +124,35 @@ const Workouts = () => {
             </DialogContent>
           </Dialog>
         </div>
+      </div>
+      
+      {/* Gender filter */}
+      <div className="mb-6">
+        <RadioGroup 
+          defaultValue="all" 
+          className="flex space-x-4"
+          value={genderFilter}
+          onValueChange={(value) => handleGenderFilterChange(value as "all" | "male" | "female")}
+        >
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="all" id="all" />
+            <Label htmlFor="all">All</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="male" id="male" />
+            <Label htmlFor="male" className="flex items-center">
+              <User className="mr-1 h-4 w-4" />
+              Men
+            </Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="female" id="female" />
+            <Label htmlFor="female" className="flex items-center">
+              <User className="mr-1 h-4 w-4" />
+              Women
+            </Label>
+          </div>
+        </RadioGroup>
       </div>
       
       {/* Display workout cards for each category at the top */}
@@ -301,6 +346,19 @@ const Workouts = () => {
               </div>
             </>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Form Scanner Dialog */}
+      <Dialog open={showFormScanner} onOpenChange={setShowFormScanner}>
+        <DialogContent className="sm:max-w-4xl max-h-[95vh] overflow-auto">
+          <DialogHeader>
+            <DialogTitle>Workout Form Scanner</DialogTitle>
+            <DialogDescription>
+              Position yourself in view of the camera to analyze your form
+            </DialogDescription>
+          </DialogHeader>
+          <FormScanner />
         </DialogContent>
       </Dialog>
     </div>
