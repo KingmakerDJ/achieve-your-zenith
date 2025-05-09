@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Clock, Dumbbell, Heart, Male, Female } from "lucide-react";
+import { Clock, Dumbbell, Heart, User } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface WorkoutCardProps {
@@ -87,7 +87,7 @@ const WorkoutCard = ({ title, category, duration, intensity, image, onClick, tar
       {targetGender !== "all" && (
         <div className="absolute top-2 right-2">
           <Badge className={`${getGenderBadgeColor(targetGender)}`}>
-            {targetGender === "male" ? <Male className="h-3 w-3 mr-1" /> : <Female className="h-3 w-3 mr-1" />}
+            <User className="h-3 w-3 mr-1" />
             {targetGender.charAt(0).toUpperCase() + targetGender.slice(1)}
           </Badge>
         </div>
