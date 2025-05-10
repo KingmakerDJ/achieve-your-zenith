@@ -28,7 +28,7 @@ const WorkoutCard = ({ title, category, duration, intensity, image, onClick }: W
 
   // Function to get video thumbnail based on category and title
   const getWorkoutVideoThumbnail = (category: string, title: string) => {
-    // Always use specific workout video thumbnails based on category
+    // Use specific workout video thumbnails based on category
     switch(category.toLowerCase()) {
       case 'chest': 
         return "https://img.youtube.com/vi/rT7DgCr-3pg/hqdefault.jpg";

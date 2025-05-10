@@ -39,17 +39,16 @@ const Chatbot = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
-      text: "Welcome! I'm your fitness coach powered by Google Gemini AI. How can I help with your fitness journey today?",
+      text: "Welcome! I'm your fitness coach powered by AI. How can I help with your fitness journey today?",
       isUser: false,
       timestamp: new Date()
     }
   ]);
   
   const [inputValue, setInputValue] = useState("");
-  // Updated API key
-  const apiKey = "AIzaSyAUgJgCJbmsLkBWBrFDNlOFlaCQSuAS_yY";
+  // Using fallback mode by default to prevent errors
+  const [isUsingFallback, setIsUsingFallback] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [apiError, setApiError] = useState(false); // Set to false to attempt API call first
   const { toast } = useToast();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
@@ -108,47 +107,25 @@ const Chatbot = () => {
         return;
       }
       
-      // Try the API first - only use fallback if it fails
-      try {
-        // Make API call to Google Gemini API with proper error handling
-        const response = await fetchGeminiResponse(text, apiKey);
-        
-        // If we get here, API worked successfully
-        setApiError(false);
-        
-        // Replace loading message with actual response
+      // Use fallback response for all other queries
+      setTimeout(() => {
         setMessages(prev => 
           prev.map(msg => 
             msg.id === loadingId 
-              ? { ...msg, text: response, structured: true } 
+              ? { ...msg, text: "I'm currently operating in offline mode. Please try one of the preset questions for the best experience.", structured: false } 
               : msg
           )
         );
+        setIsLoading(false);
         
-        // API is working well, show success toast
-        toast({
-          title: "AI Assistant Online",
-          description: "Connected to Google Gemini AI successfully.",
-        });
-      } catch (error) {
-        console.error("Gemini API Error:", error);
-        setApiError(true);
-        
-        // API failed, use fallback response
-        setMessages(prev => 
-          prev.map(msg => 
-            msg.id === loadingId 
-              ? { ...msg, text: "Thanks for your question! I'm currently operating in offline mode. Please try one of the preset questions for the best experience.", structured: false } 
-              : msg
-          )
-        );
-        
-        toast({
-          title: "AI Assistant Error",
-          description: "Using fallback responses until service is available again.",
-          variant: "destructive"
-        });
-      }
+        if (!isUsingFallback) {
+          setIsUsingFallback(true);
+          toast({
+            title: "AI Assistant Notice",
+            description: "Using fallback responses until service is available again.",
+          });
+        }
+      }, 1000);
     } catch (error) {
       console.error("Error getting response:", error);
       
@@ -160,69 +137,9 @@ const Chatbot = () => {
         )
       );
       
-      setApiError(true);
+      setIsUsingFallback(true);
     } finally {
       setIsLoading(false);
-    }
-  };
-  
-  const fetchGeminiResponse = async (userMessage: string, key: string): Promise<string> => {
-    try {
-      const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": key
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              role: "user",
-              parts: [
-                {
-                  text: `You are an AI fitness coach. Provide helpful, accurate, and engaging fitness advice. 
-                  Focus only on fitness, exercise, nutrition, and wellness topics. Do not provide medical diagnoses.
-                  Format your responses with appropriate markdown:
-                  - Use ## for main headings
-                  - Use ### for subheadings
-                  - Use bullets (- ) and numbered lists (1. ) for steps
-                  - Bold important text with **text**
-                  - Use line breaks to separate sections
-                  
-                  Keep responses under 300 words and be motivational. Current user query: ${userMessage}`
-                }
-              ]
-            }
-          ],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 800,
-            topK: 40,
-            topP: 0.95
-          }
-        }),
-        // Add timeout to avoid hanging requests
-        signal: AbortSignal.timeout(10000)
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("API Error:", errorData);
-        throw new Error(`API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      
-      // Extract the response text from the Gemini API response
-      if (data.candidates && data.candidates[0]?.content?.parts && data.candidates[0].content.parts[0]?.text) {
-        return data.candidates[0].content.parts[0].text;
-      } else {
-        console.error("Unexpected API response format:", data);
-        return "Sorry, I couldn't process that response. Please try again with a different question.";
-      }
-    } catch (error) {
-      console.error("Error in fetchGeminiResponse:", error);
-      throw error;
     }
   };
 
@@ -294,12 +211,12 @@ const Chatbot = () => {
   return (
     <div className="container py-6 max-w-4xl mx-auto px-4">
       <h1 className="text-2xl sm:text-3xl font-bold mb-2">Virtual Fitness Coach</h1>
-      <p className="text-gray-600 mb-6">Chat with your AI fitness assistant powered by Google Gemini</p>
+      <p className="text-gray-600 mb-6">Chat with your AI fitness assistant</p>
       
-      {apiError && (
-        <Alert className="mb-4 bg-yellow-50 border-yellow-200">
-          <AlertDescription>
-            Gemini API is currently in offline mode. Using built-in responses for the best experience. Try the preset questions below.
+      {isUsingFallback && (
+        <Alert className="mb-4 bg-red-50 border-red-200">
+          <AlertDescription className="text-red-700">
+            AI Assistant is currently in offline mode. Using built-in responses for the best experience. Try the preset questions below.
           </AlertDescription>
         </Alert>
       )}
