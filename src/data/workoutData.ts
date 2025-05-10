@@ -3,9 +3,13 @@ import { WorkoutVideoProps } from "../components/WorkoutVideo";
 // Expanded workout interface to include gender targeting
 export interface WorkoutData extends WorkoutVideoProps {
   targetGender?: "male" | "female" | "all";
+  equipment?: string;
+  targetMuscles?: string[];
+  calories?: number;
 }
 
 // Using data from https://www.kaggle.com/datasets/philosopher0808/gym-workoutexercises-video
+// and https://www.kaggle.com/datasets/niharika41298/gym-exercise-data
 export const workoutVideos: Record<string, WorkoutData[]> = {
   all: [
     {
@@ -18,7 +22,10 @@ export const workoutVideos: Record<string, WorkoutData[]> = {
       videoUrl: "https://www.youtube.com/embed/rT7DgCr-3pg",
       bodyPart: "Chest",
       caption: "Proper bench press technique for chest development. Focus on controlled movements and full range of motion.",
-      targetGender: "all"
+      targetGender: "all",
+      equipment: "Barbell, Bench",
+      targetMuscles: ["Pectoralis Major", "Triceps", "Anterior Deltoids"],
+      calories: 210
     },
     {
       id: "2",
@@ -30,7 +37,10 @@ export const workoutVideos: Record<string, WorkoutData[]> = {
       videoUrl: "https://www.youtube.com/embed/SW_C1A-rejs",
       bodyPart: "Legs",
       caption: "Learn proper squat form to build leg strength and improve lower body stability. Essential exercise for overall strength.",
-      targetGender: "all"
+      targetGender: "all",
+      equipment: "Barbell, Squat Rack",
+      targetMuscles: ["Quadriceps", "Hamstrings", "Glutes", "Lower Back"],
+      calories: 260
     },
     {
       id: "3",
@@ -42,7 +52,10 @@ export const workoutVideos: Record<string, WorkoutData[]> = {
       videoUrl: "https://www.youtube.com/embed/r4MzxtBKyNE",
       bodyPart: "Back",
       caption: "Master the deadlift for back strength and overall posterior chain development. Focus on hip hinge and neutral spine.",
-      targetGender: "all"
+      targetGender: "all",
+      equipment: "Barbell",
+      targetMuscles: ["Erector Spinae", "Latissimus Dorsi", "Hamstrings", "Glutes"],
+      calories: 280
     },
     {
       id: "4",
@@ -54,7 +67,10 @@ export const workoutVideos: Record<string, WorkoutData[]> = {
       videoUrl: "https://www.youtube.com/embed/eGo4IYlbE5g",
       bodyPart: "Back",
       caption: "Build a stronger back with proper pull-up technique. Great for upper body development and core stability.",
-      targetGender: "male"
+      targetGender: "male",
+      equipment: "Pull-up Bar",
+      targetMuscles: ["Latissimus Dorsi", "Biceps", "Rhomboids", "Trapezius"],
+      calories: 180
     },
     {
       id: "5",
@@ -66,7 +82,10 @@ export const workoutVideos: Record<string, WorkoutData[]> = {
       videoUrl: "https://www.youtube.com/embed/qEwKCR5JCog",
       bodyPart: "Shoulders",
       caption: "Improve shoulder strength and definition with proper overhead pressing technique. Focus on stability and control.",
-      targetGender: "all"
+      targetGender: "all",
+      equipment: "Dumbbells or Barbell",
+      targetMuscles: ["Deltoids", "Trapezius", "Triceps"],
+      calories: 170
     },
     {
       id: "6",
@@ -78,7 +97,10 @@ export const workoutVideos: Record<string, WorkoutData[]> = {
       videoUrl: "https://www.youtube.com/embed/ykJmrZ5v0Oo",
       bodyPart: "Arms",
       caption: "Focus on proper bicep curl form for arm development. Learn variations to target different parts of the biceps.",
-      targetGender: "male"
+      targetGender: "male",
+      equipment: "Dumbbells",
+      targetMuscles: ["Biceps Brachii", "Brachialis", "Brachioradialis"],
+      calories: 140
     },
     {
       id: "7",
@@ -90,7 +112,10 @@ export const workoutVideos: Record<string, WorkoutData[]> = {
       videoUrl: "https://www.youtube.com/embed/nRiJVZDpdL0",
       bodyPart: "Arms",
       caption: "Build stronger triceps with proper extension technique. Focus on full range of motion and controlled movements.",
-      targetGender: "all"
+      targetGender: "all",
+      equipment: "Dumbbells",
+      targetMuscles: ["Triceps"],
+      calories: 120
     },
     {
       id: "8",
@@ -102,7 +127,10 @@ export const workoutVideos: Record<string, WorkoutData[]> = {
       videoUrl: "https://www.youtube.com/embed/ASdvN_XEl_c",
       bodyPart: "Core",
       caption: "Strengthen your core with proper plank technique. Great for improving overall stability and posture.",
-      targetGender: "all"
+      targetGender: "all",
+      equipment: "Mat",
+      targetMuscles: ["Rectus Abdominis", "Obliques", "Lower Back"],
+      calories: 100
     },
     {
       id: "11",
@@ -114,7 +142,10 @@ export const workoutVideos: Record<string, WorkoutData[]> = {
       videoUrl: "https://www.youtube.com/embed/xDmFkJxPzeM",
       bodyPart: "Glutes",
       caption: "Focus on glute development and hip strength with proper hip thrust technique.",
-      targetGender: "female"
+      targetGender: "female",
+      equipment: "Barbell",
+      targetMuscles: ["Glutes", "Hip Flexors"],
+      calories: 150
     },
     {
       id: "12",
@@ -126,7 +157,10 @@ export const workoutVideos: Record<string, WorkoutData[]> = {
       videoUrl: "https://www.youtube.com/embed/xDmFkJxPzeM",
       bodyPart: "Pelvic Floor",
       caption: "Strengthen your pelvic floor muscles for better core stability and health.",
-      targetGender: "female"
+      targetGender: "female",
+      equipment: "Mat",
+      targetMuscles: ["Pelvic Floor Muscles"],
+      calories: 80
     },
   ],
   chest: [
@@ -140,7 +174,10 @@ export const workoutVideos: Record<string, WorkoutData[]> = {
       videoUrl: "https://www.youtube.com/embed/rT7DgCr-3pg",
       bodyPart: "Chest",
       caption: "Proper bench press technique for chest development. Focus on controlled movements and full range of motion.",
-      targetGender: "all"
+      targetGender: "all",
+      equipment: "Barbell, Bench",
+      targetMuscles: ["Pectoralis Major", "Triceps", "Anterior Deltoids"],
+      calories: 210
     },
     {
       id: "9",
@@ -152,7 +189,10 @@ export const workoutVideos: Record<string, WorkoutData[]> = {
       videoUrl: "https://www.youtube.com/embed/DbFgADa2PL8",
       bodyPart: "Upper Chest",
       caption: "Target your upper chest with the incline bench press. Focus on proper form to maximize upper chest development.",
-      targetGender: "all"
+      targetGender: "all",
+      equipment: "Barbell, Bench",
+      targetMuscles: ["Pectoralis Major", "Triceps", "Anterior Deltoids"],
+      calories: 190
     }
   ],
   back: [
@@ -166,7 +206,10 @@ export const workoutVideos: Record<string, WorkoutData[]> = {
       videoUrl: "https://www.youtube.com/embed/r4MzxtBKyNE",
       bodyPart: "Back",
       caption: "Master the deadlift for back strength and overall posterior chain development. Focus on hip hinge and neutral spine.",
-      targetGender: "all"
+      targetGender: "all",
+      equipment: "Barbell",
+      targetMuscles: ["Erector Spinae", "Latissimus Dorsi", "Hamstrings", "Glutes"],
+      calories: 280
     },
     {
       id: "4",
@@ -178,7 +221,10 @@ export const workoutVideos: Record<string, WorkoutData[]> = {
       videoUrl: "https://www.youtube.com/embed/eGo4IYlbE5g",
       bodyPart: "Back",
       caption: "Build a stronger back with proper pull-up technique. Great for upper body development and core stability.",
-      targetGender: "male"
+      targetGender: "male",
+      equipment: "Pull-up Bar",
+      targetMuscles: ["Latissimus Dorsi", "Biceps", "Rhomboids", "Trapezius"],
+      calories: 180
     }
   ],
   legs: [
@@ -192,7 +238,10 @@ export const workoutVideos: Record<string, WorkoutData[]> = {
       videoUrl: "https://www.youtube.com/embed/SW_C1A-rejs",
       bodyPart: "Legs",
       caption: "Learn proper squat form to build leg strength and improve lower body stability. Essential exercise for overall strength.",
-      targetGender: "all"
+      targetGender: "all",
+      equipment: "Barbell, Squat Rack",
+      targetMuscles: ["Quadriceps", "Hamstrings", "Glutes", "Lower Back"],
+      calories: 260
     },
     {
       id: "10",
@@ -204,7 +253,10 @@ export const workoutVideos: Record<string, WorkoutData[]> = {
       videoUrl: "https://www.youtube.com/embed/IZxyjW7MPJQ",
       bodyPart: "Legs",
       caption: "Build lower body strength with the leg press. A great complement to squats for overall leg development.",
-      targetGender: "all"
+      targetGender: "all",
+      equipment: "Leg Press Machine",
+      targetMuscles: ["Quadriceps", "Hamstrings", "Glutes"],
+      calories: 220
     },
     {
       id: "11",
@@ -216,7 +268,10 @@ export const workoutVideos: Record<string, WorkoutData[]> = {
       videoUrl: "https://www.youtube.com/embed/xDmFkJxPzeM",
       bodyPart: "Glutes",
       caption: "Focus on glute development and hip strength with proper hip thrust technique.",
-      targetGender: "female"
+      targetGender: "female",
+      equipment: "Barbell",
+      targetMuscles: ["Glutes", "Hip Flexors"],
+      calories: 150
     }
   ],
   shoulders: [
@@ -230,7 +285,10 @@ export const workoutVideos: Record<string, WorkoutData[]> = {
       videoUrl: "https://www.youtube.com/embed/qEwKCR5JCog",
       bodyPart: "Shoulders",
       caption: "Improve shoulder strength and definition with proper overhead pressing technique. Focus on stability and control.",
-      targetGender: "all"
+      targetGender: "all",
+      equipment: "Dumbbells or Barbell",
+      targetMuscles: ["Deltoids", "Trapezius", "Triceps"],
+      calories: 170
     }
   ],
   arms: [
@@ -244,7 +302,10 @@ export const workoutVideos: Record<string, WorkoutData[]> = {
       videoUrl: "https://www.youtube.com/embed/ykJmrZ5v0Oo",
       bodyPart: "Arms",
       caption: "Focus on proper bicep curl form for arm development. Learn variations to target different parts of the biceps.",
-      targetGender: "male"
+      targetGender: "male",
+      equipment: "Dumbbells",
+      targetMuscles: ["Biceps Brachii", "Brachialis", "Brachioradialis"],
+      calories: 140
     },
     {
       id: "7",
@@ -256,7 +317,10 @@ export const workoutVideos: Record<string, WorkoutData[]> = {
       videoUrl: "https://www.youtube.com/embed/nRiJVZDpdL0",
       bodyPart: "Arms",
       caption: "Build stronger triceps with proper extension technique. Focus on full range of motion and controlled movements.",
-      targetGender: "all"
+      targetGender: "all",
+      equipment: "Dumbbells",
+      targetMuscles: ["Triceps"],
+      calories: 120
     }
   ],
   core: [
@@ -270,7 +334,10 @@ export const workoutVideos: Record<string, WorkoutData[]> = {
       videoUrl: "https://www.youtube.com/embed/ASdvN_XEl_c",
       bodyPart: "Core",
       caption: "Strengthen your core with proper plank technique. Great for improving overall stability and posture.",
-      targetGender: "all"
+      targetGender: "all",
+      equipment: "Mat",
+      targetMuscles: ["Rectus Abdominis", "Obliques", "Lower Back"],
+      calories: 100
     },
     {
       id: "12",
@@ -282,7 +349,10 @@ export const workoutVideos: Record<string, WorkoutData[]> = {
       videoUrl: "https://www.youtube.com/embed/xDmFkJxPzeM",
       bodyPart: "Pelvic Floor",
       caption: "Strengthen your pelvic floor muscles for better core stability and health.",
-      targetGender: "female"
+      targetGender: "female",
+      equipment: "Mat",
+      targetMuscles: ["Pelvic Floor Muscles"],
+      calories: 80
     }
   ],
   female: [
@@ -296,7 +366,10 @@ export const workoutVideos: Record<string, WorkoutData[]> = {
       videoUrl: "https://www.youtube.com/embed/xDmFkJxPzeM",
       bodyPart: "Glutes",
       caption: "Focus on glute development and hip strength with proper hip thrust technique.",
-      targetGender: "female"
+      targetGender: "female",
+      equipment: "Barbell",
+      targetMuscles: ["Glutes", "Hip Flexors"],
+      calories: 150
     },
     {
       id: "12",
@@ -308,7 +381,10 @@ export const workoutVideos: Record<string, WorkoutData[]> = {
       videoUrl: "https://www.youtube.com/embed/xDmFkJxPzeM",
       bodyPart: "Pelvic Floor",
       caption: "Strengthen your pelvic floor muscles for better core stability and health.",
-      targetGender: "female"
+      targetGender: "female",
+      equipment: "Mat",
+      targetMuscles: ["Pelvic Floor Muscles"],
+      calories: 80
     },
     {
       id: "2",
@@ -320,7 +396,10 @@ export const workoutVideos: Record<string, WorkoutData[]> = {
       videoUrl: "https://www.youtube.com/embed/SW_C1A-rejs",
       bodyPart: "Legs",
       caption: "Learn proper squat form to build leg strength and improve lower body stability. Essential exercise for overall strength.",
-      targetGender: "all"
+      targetGender: "all",
+      equipment: "Barbell, Squat Rack",
+      targetMuscles: ["Quadriceps", "Hamstrings", "Glutes", "Lower Back"],
+      calories: 260
     }
   ],
   male: [
@@ -334,7 +413,10 @@ export const workoutVideos: Record<string, WorkoutData[]> = {
       videoUrl: "https://www.youtube.com/embed/eGo4IYlbE5g",
       bodyPart: "Back",
       caption: "Build a stronger back with proper pull-up technique. Great for upper body development and core stability.",
-      targetGender: "male"
+      targetGender: "male",
+      equipment: "Pull-up Bar",
+      targetMuscles: ["Latissimus Dorsi", "Biceps", "Rhomboids", "Trapezius"],
+      calories: 180
     },
     {
       id: "6",
@@ -346,7 +428,10 @@ export const workoutVideos: Record<string, WorkoutData[]> = {
       videoUrl: "https://www.youtube.com/embed/ykJmrZ5v0Oo",
       bodyPart: "Arms",
       caption: "Focus on proper bicep curl form for arm development. Learn variations to target different parts of the biceps.",
-      targetGender: "male"
+      targetGender: "male",
+      equipment: "Dumbbells",
+      targetMuscles: ["Biceps Brachii", "Brachialis", "Brachioradialis"],
+      calories: 140
     },
     {
       id: "1",
@@ -358,7 +443,10 @@ export const workoutVideos: Record<string, WorkoutData[]> = {
       videoUrl: "https://www.youtube.com/embed/rT7DgCr-3pg",
       bodyPart: "Chest",
       caption: "Proper bench press technique for chest development. Focus on controlled movements and full range of motion.",
-      targetGender: "all"
+      targetGender: "all",
+      equipment: "Barbell, Bench",
+      targetMuscles: ["Pectoralis Major", "Triceps", "Anterior Deltoids"],
+      calories: 210
     }
   ]
 };
@@ -457,4 +545,23 @@ export function getRecommendedWorkouts(gender?: "male" | "female") {
 export function getWorkoutVideoById(id: string): WorkoutData | undefined {
   const allVideos = workoutVideos.all;
   return allVideos.find(video => video.id === id);
+}
+
+// Get exercise plans filtered by gender and level
+export function getExercisePlans(gender?: "male" | "female", level?: string): any[] {
+  let filteredPlans = exercisePlans;
+  
+  if (gender) {
+    filteredPlans = filteredPlans.filter(plan => 
+      plan.targetGender === gender || plan.targetGender === "all"
+    );
+  }
+  
+  if (level) {
+    filteredPlans = filteredPlans.filter(plan => 
+      plan.level.toLowerCase().includes(level.toLowerCase())
+    );
+  }
+  
+  return filteredPlans;
 }
