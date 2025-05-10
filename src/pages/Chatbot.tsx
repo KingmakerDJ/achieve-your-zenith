@@ -46,8 +46,8 @@ const Chatbot = () => {
   ]);
   
   const [inputValue, setInputValue] = useState("");
-  // Using default API key but attempting to use the API first
-  const apiKey = "AIzaSyCfbKwlMAeS6lFFieCfP_XoWS0EITnMc7s";
+  // Updated API key
+  const apiKey = "AIzaSyAUgJgCJbmsLkBWBrFDNlOFlaCQSuAS_yY";
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState(false); // Set to false to attempt API call first
   const { toast } = useToast();

@@ -64,7 +64,7 @@ const WorkoutCard = ({ title, category, duration, intensity, image, onClick }: W
       onClick={onClick}
     >
       <img 
-        src={getWorkoutVideoThumbnail(category, title)} 
+        src={image || getWorkoutVideoThumbnail(category, title)} 
         alt={title} 
         className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300"
       />

@@ -1,7 +1,6 @@
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { CalendarCheck, Activity, Apple, Moon, List, User } from "lucide-react";
+import { CalendarCheck, Activity, Apple, Moon, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -120,7 +119,6 @@ const WellnessPlan = () => {
   const [selectedWorkouts, setSelectedWorkouts] = useState<SelectedWorkout[]>([]);
   const [selectedNutrients, setSelectedNutrients] = useState<SelectedNutrient[]>([]);
   const [dietPreference, setDietPreference] = useState<'all' | 'vegetarian' | 'non-vegetarian'>('all');
-  const [gender, setGender] = useState<'all' | 'male' | 'female'>('all');
 
   // Load selected items from localStorage when component mounts
   useEffect(() => {
@@ -145,11 +143,6 @@ const WellnessPlan = () => {
     const savedDietPreference = localStorage.getItem('dietPreference');
     if (savedDietPreference) {
       setDietPreference(savedDietPreference as 'all' | 'vegetarian' | 'non-vegetarian');
-    }
-
-    const savedGender = localStorage.getItem('gender');
-    if (savedGender) {
-      setGender(savedGender as 'all' | 'male' | 'female');
     }
   }, []);
 
@@ -249,15 +242,6 @@ const WellnessPlan = () => {
     });
   };
 
-  const handleGenderChange = (gender: 'all' | 'male' | 'female') => {
-    setGender(gender);
-    localStorage.setItem('gender', gender);
-    toast({
-      title: "Target Gender Updated",
-      description: `Your workout preference has been updated to ${gender}.`,
-    });
-  };
-
   return (
     <div className="container py-6">
       <div className="flex items-center mb-6">
@@ -289,36 +273,12 @@ const WellnessPlan = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <User className="h-5 w-5 mr-2" />
-                  Target Workouts
+                  <Activity className="h-5 w-5 mr-2" />
+                  Workout Categories
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div>
-                    <h3 className="font-medium mb-2">Select Your Gender Focus</h3>
-                    <div className="flex flex-wrap gap-2">
-                      <Badge 
-                        className={`cursor-pointer ${gender === 'all' ? 'bg-[#3D9DA1]' : 'bg-gray-200 text-gray-600'}`}
-                        onClick={() => handleGenderChange('all')}
-                      >
-                        All
-                      </Badge>
-                      <Badge 
-                        className={`cursor-pointer ${gender === 'male' ? 'bg-blue-500' : 'bg-gray-200 text-gray-600'}`}
-                        onClick={() => handleGenderChange('male')}
-                      >
-                        Male
-                      </Badge>
-                      <Badge 
-                        className={`cursor-pointer ${gender === 'female' ? 'bg-pink-500' : 'bg-gray-200 text-gray-600'}`}
-                        onClick={() => handleGenderChange('female')}
-                      >
-                        Female
-                      </Badge>
-                    </div>
-                  </div>
-                  
                   {selectedWorkouts.length === 0 ? (
                     <div className="text-center py-6">
                       <p className="text-gray-500">Go to the workouts page to select training plans</p>
