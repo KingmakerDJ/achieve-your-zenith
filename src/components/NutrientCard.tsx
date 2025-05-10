@@ -16,7 +16,19 @@ interface NutrientCardProps {
   onSelect?: () => void;
 }
 
+// Extend NutrientItem with additional optional properties
+interface ExtendedNutrientItem extends NutrientItem {
+  rating?: number;
+  description?: string;
+  timing?: string;
+  source?: string;
+  isVegetarian?: boolean;
+}
+
 const NutrientCard = ({ nutrient, onSelect }: NutrientCardProps) => {
+  // Cast nutrient to the extended type
+  const extendedNutrient = nutrient as ExtendedNutrientItem;
+  
   // Function to get badge color based on benefit
   const getBenefitColor = (benefit: string) => {
     const benefitLower = benefit.toLowerCase();
@@ -43,23 +55,23 @@ const NutrientCard = ({ nutrient, onSelect }: NutrientCardProps) => {
             className="w-full h-full object-cover"
           />
           <Badge className="absolute top-2 right-2">{nutrient.category}</Badge>
-          {nutrient.isVegetarian !== undefined && (
+          {extendedNutrient.isVegetarian !== undefined && (
             <Badge 
-              className={`absolute top-2 left-2 ${nutrient.isVegetarian ? 'bg-green-100 text-green-800 border-green-200' : 'bg-orange-100 text-orange-800 border-orange-200'}`}
+              className={`absolute top-2 left-2 ${extendedNutrient.isVegetarian ? 'bg-green-100 text-green-800 border-green-200' : 'bg-orange-100 text-orange-800 border-orange-200'}`}
             >
-              {nutrient.isVegetarian ? 'Vegetarian' : 'Non-Veg'}
+              {extendedNutrient.isVegetarian ? 'Vegetarian' : 'Non-Veg'}
             </Badge>
           )}
         </div>
         <CardHeader className="pb-2">
           <CardTitle className="text-lg flex items-center justify-between">
             {nutrient.name}
-            {nutrient.rating && (
+            {extendedNutrient.rating && (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex items-center text-sm font-normal">
                     <Heart className="h-4 w-4 mr-1 text-red-500 fill-red-500" />
-                    <span>{nutrient.rating}/5</span>
+                    <span>{extendedNutrient.rating}/5</span>
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -89,9 +101,9 @@ const NutrientCard = ({ nutrient, onSelect }: NutrientCardProps) => {
             </div>
           </div>
           
-          {nutrient.description && (
+          {extendedNutrient.description && (
             <div className="mb-3">
-              <p className="text-xs text-gray-600 line-clamp-2">{nutrient.description}</p>
+              <p className="text-xs text-gray-600 line-clamp-2">{extendedNutrient.description}</p>
             </div>
           )}
           
@@ -106,17 +118,17 @@ const NutrientCard = ({ nutrient, onSelect }: NutrientCardProps) => {
             </div>
           </div>
           
-          {nutrient.timing && (
+          {extendedNutrient.timing && (
             <div className="mt-2">
               <p className="text-gray-500 text-sm">Best time:</p>
-              <p className="text-xs font-medium">{nutrient.timing}</p>
+              <p className="text-xs font-medium">{extendedNutrient.timing}</p>
             </div>
           )}
           
-          {nutrient.source && (
+          {extendedNutrient.source && (
             <div className="flex items-center mt-2 text-xs text-gray-500">
               <Apple className="h-3 w-3 mr-1" />
-              <span>Source: {nutrient.source}</span>
+              <span>Source: {extendedNutrient.source}</span>
             </div>
           )}
         </CardContent>

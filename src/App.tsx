@@ -23,11 +23,9 @@ const App = () => {
       <TooltipProvider>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route element={<AuthLayout />}>
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/welcome" element={<Welcome />} />
-          </Route>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/welcome" element={<Welcome />} />
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/workouts" element={<Workouts />} />

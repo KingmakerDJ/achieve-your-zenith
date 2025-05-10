@@ -1,3 +1,4 @@
+
 import { WorkoutVideoProps } from "../components/WorkoutVideo";
 
 // Expanded workout interface to include gender targeting
@@ -7,6 +8,52 @@ export interface WorkoutData extends WorkoutVideoProps {
   targetMuscles?: string[];
   calories?: number;
 }
+
+// Define exercise plans
+const exercisePlans = [
+  {
+    id: "plan1",
+    title: "Beginner Strength",
+    level: "beginner",
+    targetGender: "all",
+    description: "A basic strength-building program for beginners",
+    duration: "4 weeks",
+    sessions: 3,
+    workouts: [
+      { id: "1", sets: 3, reps: "8-10" },
+      { id: "2", sets: 3, reps: "10-12" },
+      { id: "8", sets: 3, reps: "30sec" }
+    ]
+  },
+  {
+    id: "plan2",
+    title: "Advanced Mass Building",
+    level: "advanced",
+    targetGender: "male",
+    description: "Intensive program for muscle mass development",
+    duration: "8 weeks",
+    sessions: 5,
+    workouts: [
+      { id: "1", sets: 5, reps: "5-8" },
+      { id: "3", sets: 5, reps: "5-8" },
+      { id: "4", sets: 4, reps: "8-10" }
+    ]
+  },
+  {
+    id: "plan3",
+    title: "Women's Toning",
+    level: "intermediate",
+    targetGender: "female",
+    description: "Focused program for muscle toning and definition",
+    duration: "6 weeks",
+    sessions: 4,
+    workouts: [
+      { id: "11", sets: 3, reps: "12-15" },
+      { id: "2", sets: 3, reps: "12-15" },
+      { id: "12", sets: 3, reps: "15-20" }
+    ]
+  }
+];
 
 // Using data from https://www.kaggle.com/datasets/philosopher0808/gym-workoutexercises-video
 // and https://www.kaggle.com/datasets/niharika41298/gym-exercise-data
