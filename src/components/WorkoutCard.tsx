@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Clock, Dumbbell, Heart, User } from "lucide-react";
+import { Clock, Dumbbell } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 export interface WorkoutCardProps {
@@ -10,10 +10,9 @@ export interface WorkoutCardProps {
   intensity: "Easy" | "Medium" | "Hard";
   image: string;
   onClick?: () => void;
-  targetGender?: "male" | "female" | "all";
 }
 
-const WorkoutCard = ({ title, category, duration, intensity, image, onClick, targetGender = "all" }: WorkoutCardProps) => {
+const WorkoutCard = ({ title, category, duration, intensity, image, onClick }: WorkoutCardProps) => {
   // Function to get category color
   const getCategoryColor = (category: string) => {
     switch(category.toLowerCase()) {
@@ -59,15 +58,6 @@ const WorkoutCard = ({ title, category, duration, intensity, image, onClick, tar
     }
   };
 
-  // Get gender badge color
-  const getGenderBadgeColor = (gender: string) => {
-    switch(gender) {
-      case 'male': return 'bg-blue-500/20 text-blue-300';
-      case 'female': return 'bg-pink-500/20 text-pink-300';
-      default: return 'bg-green-500/20 text-green-300';
-    }
-  };
-
   return (
     <div 
       className="relative overflow-hidden rounded-lg shadow-md cursor-pointer group h-64"
@@ -83,15 +73,6 @@ const WorkoutCard = ({ title, category, duration, intensity, image, onClick, tar
           {category}
         </Badge>
       </div>
-
-      {targetGender !== "all" && (
-        <div className="absolute top-2 right-2">
-          <Badge className={`${getGenderBadgeColor(targetGender)}`}>
-            <User className="h-3 w-3 mr-1" />
-            {targetGender.charAt(0).toUpperCase() + targetGender.slice(1)}
-          </Badge>
-        </div>
-      )}
 
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex flex-col justify-end p-4">
         <div className="mb-2 flex items-center gap-2">

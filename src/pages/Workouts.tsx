@@ -15,25 +15,20 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 const Workouts = () => {
   const [activeBodyPart, setActiveBodyPart] = useState("all");
-  const [activeGender, setActiveGender] = useState<"all" | "male" | "female">("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedWorkout, setSelectedWorkout] = useState<any | null>(null);
   const [showVideoId, setShowVideoId] = useState<string | null>(null);
   const [showFormScanner, setShowFormScanner] = useState(false);
   const isMobile = useIsMobile();
   
-  // Get filtered workout videos based on selected body part and gender
-  const workoutVideos = getWorkoutVideos(activeBodyPart, activeGender !== "all" ? activeGender : undefined);
+  // Get filtered workout videos based on selected body part only, removing gender filter
+  const workoutVideos = getWorkoutVideos(activeBodyPart);
   
-  // Get recommended workouts filtered by gender
-  const recommendedWorkouts = getRecommendedWorkouts(activeGender !== "all" ? activeGender : undefined);
+  // Get recommended workouts without gender filtering
+  const recommendedWorkouts = getRecommendedWorkouts();
 
   const handleBodyPartChange = (value: string) => {
     setActiveBodyPart(value);
-  };
-
-  const handleGenderChange = (value: "all" | "male" | "female") => {
-    setActiveGender(value);
   };
 
   const handleWorkoutSelect = (workout: any) => {
@@ -51,8 +46,8 @@ const Workouts = () => {
     const categoriesToShow = ['chest', 'back', 'legs', 'shoulders', 'arms', 'core'];
     
     return categoriesToShow.map(category => {
-      // Get the first two videos of each category for cards, filtered by gender
-      const videos = getWorkoutVideos(category, activeGender !== "all" ? activeGender : undefined).slice(0, isMobile ? 1 : 2);
+      // Get the first two videos of each category for cards
+      const videos = getWorkoutVideos(category).slice(0, isMobile ? 1 : 2);
       
       if (videos.length === 0) return null;
       
@@ -68,7 +63,6 @@ const Workouts = () => {
                 duration={video.duration}
                 intensity={video.intensity as "Easy" | "Medium" | "Hard"}
                 image={video.thumbnailUrl}
-                targetGender={video.targetGender as "male" | "female" | "all"}
                 onClick={() => handleShowVideo(video.id)}
               />
             ))}
@@ -144,22 +138,7 @@ const Workouts = () => {
         </div>
       </div>
       
-      {/* First-level filter: Gender filter */}
-      <div className="mb-4 sm:mb-6 bg-white p-3 rounded-lg shadow-sm">
-        <h2 className="text-base sm:text-lg font-medium mb-2">Target Gender</h2>
-        <Tabs 
-          defaultValue="all" 
-          value={activeGender}
-          onValueChange={(value) => handleGenderChange(value as "all" | "male" | "female")}
-          className="w-full"
-        >
-          <TabsList className="mb-2 w-full sm:w-auto grid grid-cols-3 sm:flex">
-            <TabsTrigger value="all">All Genders</TabsTrigger>
-            <TabsTrigger value="male">Men</TabsTrigger>
-            <TabsTrigger value="female">Women</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
+      {/* Removed the gender filter section entirely */}
       
       {/* Featured workouts section */}
       <section className="mb-8 sm:mb-10">
@@ -173,7 +152,6 @@ const Workouts = () => {
               duration={workout.duration}
               intensity={workout.intensity as "Easy" | "Medium" | "Hard"}
               image={workout.image}
-              targetGender={workout.targetGender as "male" | "female" | "all"}
               onClick={() => handleWorkoutSelect(workout)}
             />
           ))}
@@ -186,7 +164,7 @@ const Workouts = () => {
         {renderWorkoutCards()}
       </section>
       
-      {/* Second-level filter: Body part tabs */}
+      {/* Body part tabs */}
       <div id="all-workouts">
         <Tabs defaultValue="all" className="w-full" onValueChange={handleBodyPartChange} value={activeBodyPart}>
           <h2 className="text-xl sm:text-2xl font-bold mb-4">All Workout Videos</h2>
@@ -254,12 +232,6 @@ const Workouts = () => {
                             }`}>
                               {workout.intensity}
                             </span>
-                            {workout.targetGender !== "all" && (
-                              <span className="bg-slate-100 py-1 px-2 rounded-md text-xs flex items-center">
-                                <User className="mr-1 h-3 w-3" />
-                                {workout.targetGender === "male" ? "Men" : "Women"}
-                              </span>
-                            )}
                           </div>
                           {workout.caption && (
                             <p className="text-sm text-gray-600 line-clamp-2">{workout.caption}</p>
@@ -329,12 +301,6 @@ const Workouts = () => {
                   }`}>
                     {video.intensity}
                   </span>
-                  {video.targetGender !== "all" && (
-                    <span className="bg-slate-100 py-1 px-2 rounded-md text-xs flex items-center">
-                      <User className="mr-1 h-3 w-3" />
-                      {video.targetGender === "male" ? "Men" : "Women"}
-                    </span>
-                  )}
                   <span className="text-xs bg-slate-100 py-1 px-2 rounded ml-auto">{video.duration}</span>
                 </div>
               </>
@@ -368,12 +334,6 @@ const Workouts = () => {
                   }`}>
                     {selectedWorkout.intensity}
                   </span>
-                  {selectedWorkout.targetGender !== "all" && (
-                    <span className="bg-slate-100 py-1 px-2 rounded-md text-xs flex items-center">
-                      <User className="mr-1 h-3 w-3" />
-                      {selectedWorkout.targetGender === "male" ? "Men" : "Women"}
-                    </span>
-                  )}
                 </div>
                 
                 <h3 className="font-medium">Exercises</h3>
@@ -417,3 +377,4 @@ const Workouts = () => {
 };
 
 export default Workouts;
+
