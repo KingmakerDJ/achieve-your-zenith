@@ -16,13 +16,13 @@ interface NutrientCardProps {
   onSelect?: () => void;
 }
 
-// Extend NutrientItem with additional optional properties
+// Define additional optional properties separate from required NutrientItem properties
 interface ExtendedNutrientItem extends NutrientItem {
   rating?: number;
   description?: string;
   timing?: string;
   source?: string;
-  isVegetarian?: boolean;
+  // isVegetarian is already required in NutrientItem, no need to redefine it
 }
 
 const NutrientCard = ({ nutrient, onSelect }: NutrientCardProps) => {
@@ -55,13 +55,11 @@ const NutrientCard = ({ nutrient, onSelect }: NutrientCardProps) => {
             className="w-full h-full object-cover"
           />
           <Badge className="absolute top-2 right-2">{nutrient.category}</Badge>
-          {extendedNutrient.isVegetarian !== undefined && (
-            <Badge 
-              className={`absolute top-2 left-2 ${extendedNutrient.isVegetarian ? 'bg-green-100 text-green-800 border-green-200' : 'bg-orange-100 text-orange-800 border-orange-200'}`}
-            >
-              {extendedNutrient.isVegetarian ? 'Vegetarian' : 'Non-Veg'}
-            </Badge>
-          )}
+          <Badge 
+            className={`absolute top-2 left-2 ${nutrient.isVegetarian ? 'bg-green-100 text-green-800 border-green-200' : 'bg-orange-100 text-orange-800 border-orange-200'}`}
+          >
+            {nutrient.isVegetarian ? 'Vegetarian' : 'Non-Veg'}
+          </Badge>
         </div>
         <CardHeader className="pb-2">
           <CardTitle className="text-lg flex items-center justify-between">
