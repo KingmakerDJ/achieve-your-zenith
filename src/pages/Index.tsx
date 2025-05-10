@@ -2,7 +2,8 @@
 import { Navigate } from "react-router-dom";
 
 const Index = () => {
-  return <Navigate to="/" replace />;
+  // Redirect to welcome page instead of redirecting to itself
+  return <Navigate to="/welcome" replace />;
 };
 
 export default Index;

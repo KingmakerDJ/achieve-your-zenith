@@ -16,14 +16,16 @@ interface NutrientCardProps {
   onSelect?: () => void;
 }
 
-// Define additional optional properties separate from required NutrientItem properties
-interface ExtendedNutrientItem extends NutrientItem {
+// Define additional optional properties as a separate type
+type ExtendedNutrientProperties = {
   rating?: number;
   description?: string;
   timing?: string;
   source?: string;
-  // isVegetarian is already required in NutrientItem, no need to redefine it
-}
+};
+
+// Use a type intersection for extended nutrient item
+type ExtendedNutrientItem = NutrientItem & ExtendedNutrientProperties;
 
 const NutrientCard = ({ nutrient, onSelect }: NutrientCardProps) => {
   // Cast nutrient to the extended type
