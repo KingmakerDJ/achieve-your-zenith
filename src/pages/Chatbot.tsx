@@ -17,6 +17,7 @@ interface Message {
   structured?: boolean;
 }
 
+// Preset buttons and their responses
 const presetButtons = [
   "Get fitness tips",
   "Create a workout plan",
@@ -35,7 +36,8 @@ const fallbackResponses: Record<string, string> = {
   "Recovery strategies": "## Recovery Strategies\n\n### Active Recovery\n- Light movement on rest days (walking, swimming, yoga)\n- Promotes blood flow without taxing muscles\n\n### Sleep Optimization\n- Aim for 7-9 hours of quality sleep\n- Create a consistent sleep schedule\n\n### Other Techniques\n- **Foam rolling** to release muscle tension\n- **Contrast therapy** (alternating hot and cold)\n- **Proper nutrition** with focus on protein and anti-inflammatory foods\n\n**Remember:** Recovery is when your body actually builds muscle and gets stronger!"
 };
 
-const API_KEY = "AIzaSyAUgJgCJbmsLkBWBrFDNlOFlaCQSuAS_yY";
+// Updated API key constant
+const API_KEY = "AIzaSyBo5T7WgNbPMzXqCzfueN-sX-ySgWj4uw4"; 
 
 const Chatbot = () => {
   const [messages, setMessages] = useState<Message[]>([
@@ -48,7 +50,6 @@ const Chatbot = () => {
   ]);
   
   const [inputValue, setInputValue] = useState("");
-  // Using online mode by default
   const [isUsingFallback, setIsUsingFallback] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -109,9 +110,9 @@ const Chatbot = () => {
         return;
       }
       
-      // If not a preset, use active API call
+      // If not a preset, use active API call with updated endpoint and model
       try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEY}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

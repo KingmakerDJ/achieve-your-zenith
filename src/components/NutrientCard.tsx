@@ -54,7 +54,7 @@ const NutrientCard = ({ nutrient, onSelect }: NutrientCardProps) => {
 
   return (
     <TooltipProvider>
-      <Card className="h-full flex flex-col">
+      <Card className="h-full flex flex-col hover:shadow-md transition-shadow">
         <div className="aspect-video relative overflow-hidden">
           <img
             src={nutrient.image}
@@ -137,12 +137,12 @@ const NutrientCard = ({ nutrient, onSelect }: NutrientCardProps) => {
             </div>
           )}
           
-          {/* Homemade Alternatives - Now directly displayed in the card */}
+          {/* Homemade Alternatives - Now directly displayed in the card in an expandable section */}
           {homemadeOptions.length > 0 && (
             <div className="mt-4">
               <Collapsible className="w-full">
                 <CollapsibleTrigger asChild>
-                  <Button variant="outline" size="sm" className="w-full text-xs flex items-center justify-between">
+                  <Button variant="outline" size="sm" className="w-full text-xs flex items-center justify-between bg-green-50 hover:bg-green-100 border-green-200">
                     <div className="flex items-center">
                       <ChefHat className="h-3 w-3 mr-1" />
                       <span>Homemade Alternatives</span>
@@ -151,9 +151,9 @@ const NutrientCard = ({ nutrient, onSelect }: NutrientCardProps) => {
                   </Button>
                 </CollapsibleTrigger>
                 <CollapsibleContent className="mt-2">
-                  <div className="space-y-2 p-2 bg-gray-50 rounded-md">
+                  <div className="space-y-2 p-2 bg-gray-50 rounded-md border border-green-100">
                     {homemadeOptions.map((option, index) => (
-                      <div key={index} className={`p-2 ${index > 0 ? 'border-t pt-2' : ''}`}>
+                      <div key={index} className={`p-2 ${index > 0 ? 'border-t border-green-100 pt-2' : ''}`}>
                         <p className="font-medium text-xs">{option.name}</p>
                         <p className="text-xs text-gray-500">{option.description}</p>
                         <div className="mt-1 flex justify-between text-xs">
@@ -168,12 +168,12 @@ const NutrientCard = ({ nutrient, onSelect }: NutrientCardProps) => {
             </div>
           )}
         </CardContent>
-        <CardFooter className="pt-0">
+        <CardFooter className="pt-0 mt-auto">
           {onSelect && (
             <Button 
               onClick={onSelect}
               variant="outline" 
-              className="w-full"
+              className="w-full hover:bg-[#3D9DA1]/10"
             >
               Add to Plan
             </Button>
