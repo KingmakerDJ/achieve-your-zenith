@@ -10,12 +10,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { getHomemadeFoodAlternatives } from "@/data/nutrientData";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface NutrientCardProps {
   nutrient: NutrientItem;
@@ -141,32 +137,34 @@ const NutrientCard = ({ nutrient, onSelect }: NutrientCardProps) => {
             </div>
           )}
           
-          {/* Homemade Alternatives */}
+          {/* Homemade Alternatives - Now directly displayed in the card */}
           {homemadeOptions.length > 0 && (
-            <div className="mt-3">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" size="sm" className="w-full text-xs">
-                    <ChefHat className="h-3 w-3 mr-1" />
-                    Homemade Alternatives
+            <div className="mt-4">
+              <Collapsible className="w-full">
+                <CollapsibleTrigger asChild>
+                  <Button variant="outline" size="sm" className="w-full text-xs flex items-center justify-between">
+                    <div className="flex items-center">
+                      <ChefHat className="h-3 w-3 mr-1" />
+                      <span>Homemade Alternatives</span>
+                    </div>
+                    <span className="text-xs opacity-50">▼</span>
                   </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-64 p-2">
-                  <div className="space-y-2">
-                    <h4 className="font-medium text-sm">Natural Alternatives</h4>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="mt-2">
+                  <div className="space-y-2 p-2 bg-gray-50 rounded-md">
                     {homemadeOptions.map((option, index) => (
-                      <div key={index} className="p-2 bg-gray-50 rounded text-xs">
-                        <p className="font-medium">{option.name}</p>
-                        <p className="text-gray-500">{option.description}</p>
-                        <div className="mt-1 flex justify-between">
+                      <div key={index} className={`p-2 ${index > 0 ? 'border-t pt-2' : ''}`}>
+                        <p className="font-medium text-xs">{option.name}</p>
+                        <p className="text-xs text-gray-500">{option.description}</p>
+                        <div className="mt-1 flex justify-between text-xs">
                           <span>{option.calories} kcal</span>
                           <span className="text-blue-600">P: {option.protein}g</span>
                         </div>
                       </div>
                     ))}
                   </div>
-                </PopoverContent>
-              </Popover>
+                </CollapsibleContent>
+              </Collapsible>
             </div>
           )}
         </CardContent>

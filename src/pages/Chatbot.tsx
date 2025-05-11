@@ -35,6 +35,8 @@ const fallbackResponses: Record<string, string> = {
   "Recovery strategies": "## Recovery Strategies\n\n### Active Recovery\n- Light movement on rest days (walking, swimming, yoga)\n- Promotes blood flow without taxing muscles\n\n### Sleep Optimization\n- Aim for 7-9 hours of quality sleep\n- Create a consistent sleep schedule\n\n### Other Techniques\n- **Foam rolling** to release muscle tension\n- **Contrast therapy** (alternating hot and cold)\n- **Proper nutrition** with focus on protein and anti-inflammatory foods\n\n**Remember:** Recovery is when your body actually builds muscle and gets stronger!"
 };
 
+const API_KEY = "AIzaSyAUgJgCJbmsLkBWBrFDNlOFlaCQSuAS_yY";
+
 const Chatbot = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -46,8 +48,8 @@ const Chatbot = () => {
   ]);
   
   const [inputValue, setInputValue] = useState("");
-  // Using fallback mode by default to prevent errors
-  const [isUsingFallback, setIsUsingFallback] = useState(true);
+  // Using online mode by default
+  const [isUsingFallback, setIsUsingFallback] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -107,37 +109,71 @@ const Chatbot = () => {
         return;
       }
       
-      // Use fallback response for all other queries
-      setTimeout(() => {
+      // If not a preset, use active API call
+      try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: `You are a fitness assistant. Answer this question about fitness, nutrition, or wellness in a helpful, concise way: ${text}`
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.7,
+              topK: 40,
+              topP: 0.95,
+              maxOutputTokens: 1024,
+            }
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`API request failed with status ${response.status}`);
+        }
+
+        const data = await response.json();
+        const aiResponse = data.candidates[0].content.parts[0].text;
+        
         setMessages(prev => 
           prev.map(msg => 
             msg.id === loadingId 
-              ? { ...msg, text: "I'm currently operating in offline mode. Please try one of the preset questions for the best experience.", structured: false } 
+              ? { ...msg, text: aiResponse, structured: true } 
               : msg
           )
         );
-        setIsLoading(false);
         
+        // Mark that we're not using fallbacks
+        if (isUsingFallback) {
+          setIsUsingFallback(false);
+          toast({
+            title: "Connected to AI Service",
+            description: "Using the AI service for responses now.",
+          });
+        }
+      } catch (error) {
+        console.error("Error with AI API:", error);
+        // If API call fails, use fallback
+        setMessages(prev => 
+          prev.map(msg => 
+            msg.id === loadingId 
+              ? { ...msg, text: "I don't have a specific answer for that question. Please try one of the preset questions for the best experience.", structured: false } 
+              : msg
+          )
+        );
+        
+        // Only show toast if we weren't already in fallback mode
         if (!isUsingFallback) {
           setIsUsingFallback(true);
           toast({
-            title: "AI Assistant Notice",
-            description: "Using fallback responses until service is available again.",
+            title: "API Connection Issue",
+            description: "Using fallback responses. Please try preset questions.",
           });
         }
-      }, 1000);
-    } catch (error) {
-      console.error("Error getting response:", error);
-      
-      setMessages(prev => 
-        prev.map(msg => 
-          msg.id === loadingId 
-            ? { ...msg, text: "Sorry, I encountered an error. Please try again or use one of the preset questions." } 
-            : msg
-        )
-      );
-      
-      setIsUsingFallback(true);
+      }
     } finally {
       setIsLoading(false);
     }

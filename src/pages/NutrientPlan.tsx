@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -72,7 +71,7 @@ const NutrientPlan = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div className="flex items-center">
           <Apple className="h-7 w-7 mr-2 text-[#3D9DA1]" />
-          <h1 className="text-3xl font-bold">Indian Nutrition Plan</h1>
+          <h1 className="text-3xl font-bold">Nutrition Plan</h1>
         </div>
       </div>
 
