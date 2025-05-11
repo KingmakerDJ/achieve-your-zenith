@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,9 +35,6 @@ const fallbackResponses: Record<string, string> = {
   "Recovery strategies": "## Recovery Strategies\n\n### Active Recovery\n- Light movement on rest days (walking, swimming, yoga)\n- Promotes blood flow without taxing muscles\n\n### Sleep Optimization\n- Aim for 7-9 hours of quality sleep\n- Create a consistent sleep schedule\n\n### Other Techniques\n- **Foam rolling** to release muscle tension\n- **Contrast therapy** (alternating hot and cold)\n- **Proper nutrition** with focus on protein and anti-inflammatory foods\n\n**Remember:** Recovery is when your body actually builds muscle and gets stronger!"
 };
 
-// Updated API key constant
-const API_KEY = "AIzaSyBo5T7WgNbPMzXqCzfueN-sX-ySgWj4uw4"; 
-
 const Chatbot = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -56,7 +52,6 @@ const Chatbot = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
   
-  // Auto-scroll to bottom of messages
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -68,7 +63,6 @@ const Chatbot = () => {
   const handleSendMessage = async (text: string = inputValue) => {
     if (!text.trim()) return;
     
-    // Add user message
     const userMessage: Message = {
       id: messages.length + 1,
       text,
@@ -79,7 +73,6 @@ const Chatbot = () => {
     setMessages(prev => [...prev, userMessage]);
     setInputValue("");
     
-    // Add loading message
     const loadingId = messages.length + 2;
     const loadingMessage: Message = {
       id: loadingId,
@@ -91,110 +84,56 @@ const Chatbot = () => {
     setMessages(prev => [...prev, loadingMessage]);
     setIsLoading(true);
     
-    try {
-      // Check for preset responses first
-      const presetResponse = fallbackResponses[text];
-      
-      if (presetResponse) {
-        // Simulate API delay for better UX
-        setTimeout(() => {
-          setMessages(prev => 
-            prev.map(msg => 
-              msg.id === loadingId 
-                ? { ...msg, text: presetResponse, structured: true } 
-                : msg
-            )
-          );
-          setIsLoading(false);
-        }, 1000);
-        return;
-      }
-      
-      // If not a preset, use active API call with updated endpoint and model
-      try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEY}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            contents: [{
-              parts: [{
-                text: `You are a fitness assistant. Answer this question about fitness, nutrition, or wellness in a helpful, concise way: ${text}`
-              }]
-            }],
-            generationConfig: {
-              temperature: 0.7,
-              topK: 40,
-              topP: 0.95,
-              maxOutputTokens: 1024,
-            }
-          })
-        });
-
-        if (!response.ok) {
-          throw new Error(`API request failed with status ${response.status}`);
-        }
-
-        const data = await response.json();
-        const aiResponse = data.candidates[0].content.parts[0].text;
-        
+    // Check for preset responses first
+    const presetResponse = fallbackResponses[text];
+    if (presetResponse) {
+      setTimeout(() => {
         setMessages(prev => 
           prev.map(msg => 
             msg.id === loadingId 
-              ? { ...msg, text: aiResponse, structured: true } 
+              ? { ...msg, text: presetResponse, structured: true } 
               : msg
           )
         );
-        
-        // Mark that we're not using fallbacks
-        if (isUsingFallback) {
-          setIsUsingFallback(false);
-          toast({
-            title: "Connected to AI Service",
-            description: "Using the AI service for responses now.",
-          });
-        }
-      } catch (error) {
-        console.error("Error with AI API:", error);
-        // If API call fails, use fallback
-        setMessages(prev => 
-          prev.map(msg => 
-            msg.id === loadingId 
-              ? { ...msg, text: "I don't have a specific answer for that question. Please try one of the preset questions for the best experience.", structured: false } 
-              : msg
-          )
-        );
-        
-        // Only show toast if we weren't already in fallback mode
-        if (!isUsingFallback) {
-          setIsUsingFallback(true);
-          toast({
-            title: "API Connection Issue",
-            description: "Using fallback responses. Please try preset questions.",
-          });
-        }
-      }
-    } finally {
-      setIsLoading(false);
+        setIsLoading(false);
+      }, 1000);
+      return;
+    }
+
+    // If no preset response, use fallback response
+    setMessages(prev => 
+      prev.map(msg => 
+        msg.id === loadingId 
+          ? { 
+              ...msg, 
+              text: "I understand you're asking about fitness. For the best experience, please try one of the preset questions above.", 
+              structured: false 
+            } 
+          : msg
+      )
+    );
+    setIsLoading(false);
+    
+    if (!isUsingFallback) {
+      setIsUsingFallback(true);
+      toast({
+        title: "Using Preset Responses",
+        description: "Please use the preset questions for the best experience.",
+      });
     }
   };
 
-  // Function to render structured message content with markdown-like formatting
   const renderStructuredContent = (content: string) => {
-    // Split into paragraphs
     const paragraphs = content.split('\n\n');
     
     return (
       <div className="space-y-3">
         {paragraphs.map((paragraph, index) => {
-          // Handle headings
           if (paragraph.startsWith('## ')) {
             return <h2 key={index} className="text-xl font-bold mt-4">{paragraph.substring(3)}</h2>;
           } else if (paragraph.startsWith('### ')) {
             return <h3 key={index} className="text-lg font-semibold mt-3">{paragraph.substring(4)}</h3>;
           } 
-          // Handle bullet points
           else if (paragraph.includes('\n- ')) {
             const [title, ...items] = paragraph.split('\n- ');
             return (
@@ -206,7 +145,6 @@ const Chatbot = () => {
               </div>
             );
           }
-          // Handle numbered lists
           else if (paragraph.includes('\n1. ')) {
             const [title, ...items] = paragraph.split('\n');
             return (
@@ -221,26 +159,18 @@ const Chatbot = () => {
               </div>
             );
           }
-          // Regular paragraph
-          else {
-            return <p key={index} className="text-gray-800">{formatTextWithBold(paragraph)}</p>;
-          }
+          return <p key={index} className="text-gray-800">{formatTextWithBold(paragraph)}</p>;
         })}
       </div>
     );
   };
   
-  // Helper function to format bold text within a string
   const formatTextWithBold = (text: string) => {
-    // Split by bold markers
     const parts = text.split(/(\*\*.*?\*\*)/g);
-    
     return parts.map((part, index) => {
       if (part.startsWith('**') && part.endsWith('**')) {
-        // Bold text
         return <strong key={index}>{part.slice(2, -2)}</strong>;
       }
-      // Regular text
       return <span key={index}>{part}</span>;
     });
   };
@@ -270,7 +200,6 @@ const Chatbot = () => {
           </div>
           
           <div className="flex flex-col h-[65vh] sm:h-[70vh]">
-            {/* Chat messages */}
             <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
               {messages.map(message => (
                 <div 
@@ -294,10 +223,9 @@ const Chatbot = () => {
                   </div>
                 </div>
               ))}
-              <div ref={messagesEndRef} /> {/* Scroll anchor */}
+              <div ref={messagesEndRef} />
             </div>
             
-            {/* Preset buttons - made scrollable on small screens */}
             <div className="p-2 sm:p-4 border-t overflow-x-auto">
               <div className="flex gap-2 pb-2 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300">
                 {presetButtons.map(text => (
@@ -314,7 +242,6 @@ const Chatbot = () => {
               </div>
             </div>
             
-            {/* Input area - made more visible and responsive */}
             <div className="p-3 sm:p-4 border-t mt-auto bg-gray-50">
               <form 
                 className="flex gap-2" 
